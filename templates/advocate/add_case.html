@@ -1,0 +1,327 @@
+{% extends 'advocate/advocate_navbar.html' %}
+{% load static %}
+
+{% block content %}
+<div class="case-container">
+    <h1>Add Case</h1>
+    {% if error_message %}
+        <script>alert("{{ error_message }}");</script>
+    {% endif %}
+    
+    <form method="post" enctype="multipart/form-data" id="addCaseForm">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="case_number" class="file-label">Case Number:</label>
+            <input type="text" name="case_number" id="case_number" class="form-input" placeholder="Enter case number">
+            <span id="caseNumberError" class="error-message"></span>
+        </div>
+        
+        <div class="form-group">
+            <label for="case_name" class="file-label">Case Name:</label>
+            <input type="text" name="case_name" id="case_name" class="form-input" placeholder="Enter case name">
+            <span id="caseNameError" class="error-message"></span>
+        </div>
+        
+        <div class="form-group">
+            <label for="case_status">Case Status:</label>
+            <select name="case_status" id="case_status" required>
+                <option value="">Select Status</option>
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Dismissed">Dismissed</option>
+                <option value="Closed">Closed</option>
+                <option value="On Hold">On Hold</option>
+                <option value="Awaiting Evidence">Awaiting Evidence</option>
+                <option value="Settled">Settled</option>
+            </select>
+            <span id="caseStatusError" class="error-message"></span>
+        </div>
+        
+        <div class="form-group">
+            <label for="case_date" class="file-label">Case Date:</label>
+            <input type="date" name="case_date" id="case_date" class="form-input">
+            <span id="caseDateError" class="error-message"></span>
+        </div>
+        
+        <div class="form-group">
+            <label for="days_taken" class="file-label">Days Taken:</label>
+            <input type="number" name="days_taken" id="days_taken" class="form-input" placeholder="Enter number of days">
+            <span id="daysTakenError" class="error-message"></span>
+        </div>
+        
+        <div class="form-group">
+            <label for="court_name" class="file-label">Court Name:</label>
+            <input type="text" name="court_name" id="court_name" class="form-input" placeholder="Enter court name">
+            <span id="courtNameError" class="error-message"></span>
+        </div>
+        
+        <div class="form-group">
+            <label for="case_category" class="file-label">Case Category:</label>
+            <select name="case_category" id="case_category" class="form-input">
+                {% for cat_id, cat_name in category_choices %}
+                    <option value="{{ cat_id }}">{{ cat_name }}</option>
+                {% endfor %}
+            </select>
+            <span id="caseCategoryError" class="error-message"></span>
+        </div>
+        
+        
+        <button type="submit" class="submit-btn">Add Case</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const proofInput = document.getElementById('proof_url');
+        const proofPreview = document.getElementById('proof-preview');
+        
+        proofInput.addEventListener('change', () => {
+            const file = proofInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (file.type === "application/pdf") {
+                        proofPreview.innerHTML = `<a href="${e.target.result}" target="_blank">View Selected Proof</a>`;
+                    } else {
+                        proofPreview.innerHTML = `<img src="${e.target.result}" alt="Selected Proof" class="preview-img">`;
+                    }
+                };
+                reader.readAsDataURL(file);
+            } else {
+                proofPreview.innerHTML = `<p>No proof selected</p>`;
+            }
+        });
+
+        function validateCaseNumber(caseNumber) {
+            const regex = /^[A-Za-z0-9\-]+$/;
+            if (!caseNumber) {
+                return { isValid: false, message: 'Case number is required' };
+            } else if (!regex.test(caseNumber)) {
+                return { isValid: false, message: 'Invalid case number format' };
+            }
+            return { isValid: true, message: '' };
+        }
+
+        function validateCaseName(caseName) {
+            const regex = /^[A-Za-z\s]+$/;
+            if (!caseName) {
+                return { isValid: false, message: 'Case name is required' };
+            } else if (!regex.test(caseName)) {
+                return { isValid: false, message: 'Case name must contain only letters and spaces' };
+            }
+            return { isValid: true, message: '' };
+        }
+
+        function validateDaysTaken(daysTaken) {
+            if (!daysTaken) {
+                return { isValid: false, message: 'Days taken is required' };
+            } else if (isNaN(daysTaken) || daysTaken <= 0) {
+                return { isValid: false, message: 'Days taken must be a positive number' };
+            }
+            return { isValid: true, message: '' };
+        }
+
+        function validateCaseDate(caseDate) {
+            if (!caseDate) {
+                return { isValid: false, message: 'Case date is required' };
+            }
+            return { isValid: true, message: '' };
+        }
+
+        function validateCourtName(courtName) {
+            if (!courtName) {
+                return { isValid: false, message: 'Court name is required' };
+            }
+            return { isValid: true, message: '' };
+        }
+
+        function validateCaseCategory(caseCategory) {
+            if (!caseCategory) {
+                return { isValid: false, message: 'Case category is required' };
+            }
+            return { isValid: true, message: '' };
+        }
+
+        function attachInputValidation(inputElement, validationFunction, errorElementId) {
+            inputElement.addEventListener('input', () => {
+                const { isValid, message } = validationFunction(inputElement.value);
+                document.getElementById(errorElementId).textContent = message;
+                if (isValid) {
+                    inputElement.classList.remove('invalid');
+                    inputElement.classList.add('valid');
+                } else {
+                    inputElement.classList.remove('valid');
+                    inputElement.classList.add('invalid');
+                }
+            });
+        }
+
+        attachInputValidation(document.getElementById('case_number'), validateCaseNumber, 'caseNumberError');
+        attachInputValidation(document.getElementById('case_name'), validateCaseName, 'caseNameError');
+        attachInputValidation(document.getElementById('days_taken'), validateDaysTaken, 'daysTakenError');
+        attachInputValidation(document.getElementById('case_date'), validateCaseDate, 'caseDateError');
+        attachInputValidation(document.getElementById('court_name'), validateCourtName, 'courtNameError');
+        attachInputValidation(document.getElementById('case_category'), validateCaseCategory, 'caseCategoryError');
+
+        document.getElementById('addCaseForm').addEventListener('submit', function(event) {
+            let isValid = true;
+
+            const caseNumberInput = document.getElementById('case_number');
+            const caseNameInput = document.getElementById('case_name');
+            const daysTakenInput = document.getElementById('days_taken');
+            const caseDateInput = document.getElementById('case_date');
+            const courtNameInput = document.getElementById('court_name');
+            const caseCategoryInput = document.getElementById('case_category');
+
+            const caseNumberError = validateCaseNumber(caseNumberInput.value);
+            document.getElementById('caseNumberError').textContent = caseNumberError.message;
+            if (!caseNumberError.isValid) isValid = false;
+
+            const caseNameError = validateCaseName(caseNameInput.value);
+            document.getElementById('caseNameError').textContent = caseNameError.message;
+            if (!caseNameError.isValid) isValid = false;
+
+            const daysTakenError = validateDaysTaken(daysTakenInput.value);
+            document.getElementById('daysTakenError').textContent = daysTakenError.message;
+            if (!daysTakenError.isValid) isValid = false;
+
+            const caseDateError = validateCaseDate(caseDateInput.value);
+            document.getElementById('caseDateError').textContent = caseDateError.message;
+            if (!caseDateError.isValid) isValid = false;
+
+            const courtNameError = validateCourtName(courtNameInput.value);
+            document.getElementById('courtNameError').textContent = courtNameError.message;
+            if (!courtNameError.isValid) isValid = false;
+
+            const caseCategoryError = validateCaseCategory(caseCategoryInput.value);
+            document.getElementById('caseCategoryError').textContent = caseCategoryError.message;
+            if (!caseCategoryError.isValid) isValid = false;
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    });
+</script>
+
+<style>
+    /* Base Styles */
+body {
+    font-family: Arial, sans-serif;
+    color: #333;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+}
+
+/* Container */
+.case-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Heading */
+.case-container h1 {
+    margin-top: 0;
+    font-size: 24px;
+    color: #333;
+}
+
+/* Form */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.file-label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-input, .file-input, .file-preview {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.form-input {
+    font-size: 16px;
+}
+
+.file-input {
+    padding: 0;
+}
+
+.file-preview {
+    margin-top: 10px;
+}
+
+.file-preview img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.submit-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 15px;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Error Message */
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+/* Valid and Invalid Input Styles */
+.form-input.valid {
+    border-color: #28a745;
+}
+
+.form-input.invalid {
+    border-color: #dc3545;
+}
+select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-color: white;
+        background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 12px 12px;
+        padding-right: 40px;
+    }
+</style>
+{% endblock %}

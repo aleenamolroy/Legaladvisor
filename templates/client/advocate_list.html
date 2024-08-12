@@ -1,0 +1,90 @@
+{% extends 'client/client_navbar.html' %}
+{% load static %}
+
+{% block content %}
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+
+<div class="container mt-4">
+    <h1 class="mb-4">Advocate List</h1>
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Age</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Category</th>
+                <th>Average Rating</th>
+                <th>Review Count</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for advocate in advocates %}
+            <tr>
+                <td><img src="{{ advocate.u_img }}" alt="Image" class="img-fluid" width="50"></td>
+                <td>{{ advocate.u_name }}</td>
+                <td>{{ advocate.gender }}</td>
+                <td>{{ advocate.age }}</td>
+                <td>{{ advocate.address }}</td>
+                <td>{{ advocate.phone }}</td>
+                <td>{{ advocate.email }}</td>
+                <td>{{ advocate.category_name }}</td>
+                <td>
+                    <div class="stars">
+                        {% for i in star_range %}
+                            {% if i <= advocate.average_rating %}
+                                <i class="fas fa-star text-warning"></i>
+                            {% else %}
+                                <i class="far fa-star text-muted"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    
+                    
+                    
+                    ({{ advocate.average_rating|default:"N/A" }})
+                </td>
+                <td>{{ advocate.review_count|default:0 }}</td>
+                <td>
+                    
+                        {% if advocate.request_status == 0 %}
+                            <button type="button" class="btn btn-warning" disabled>Pending</button>
+                        {% elif advocate.request_status == 1 %}
+                            <button type="button" class="btn btn-success" disabled>Accepted</button>
+                        {% else %}
+                            <button type="button" class="btn btn-primary view-profile" data-id="{{ advocate.u_id }}" onclick="sendRequest({{ advocate.u_id }});">Connect</button>
+                        {% endif %}
+                  
+                                    </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script >
+function sendRequest(advocate_id) {
+    $.ajax({
+        url: '{% url "send_request" %}',
+        method: 'POST',
+        data: {
+            'advocate_id': advocate_id,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+            alert('Request sent successfully!');
+            $('button[data-id="' + advocate_id + '"]').replaceWith('<button type="button" class="btn btn-warning" disabled>Pending</button>');
+        },
+        error: function(xhr, status, error) {
+            alert('Failed to send request.');
+        }
+    });
+}
+</script>
+{% endblock %}

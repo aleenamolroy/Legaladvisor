@@ -1,0 +1,82 @@
+{% extends 'advocate/advocate_navbar.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="profile-container">
+        <h1>Advocate Profile</h1>
+        {% if data.msg %}
+            <p>{{ data.msg }}</p>
+        {% else %}
+            <img src="{{ data.img_url }}" alt="Profile Image" class="profile-img">
+            <div class="profile-details">
+                <div class="detail-group">
+                    <label for="enrollment_number">Enrollment Number:</label>
+                    <div id="enrollment_number" class="detail">{{ data.enrollment_number }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="name">Name:</label>
+                    <div id="name" class="detail">{{ data.name }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="age">Age:</label>
+                    <div id="age" class="detail">{{ data.age }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="gender">Gender:</label>
+                    <div id="gender" class="detail">{{ data.gender }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="email">Email:</label>
+                    <div id="email" class="detail">{{ data.email }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="phone">Phone:</label>
+                    <div id="phone" class="detail">{{ data.phone }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="address">Address:</label>
+                    <div id="address" class="detail">{{ data.address }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="state">State:</label>
+                    <div id="state" class="detail">{{ data.state }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="district">District:</label>
+                    <div id="district" class="detail">{{ data.district }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="pincode">Pincode:</label>
+                    <div id="pincode" class="detail">{{ data.pincode }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="idproof_type">ID Proof Type:</label>
+                    <div id="idproof_type" class="detail">{{ data.id_proof_type }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="idproof">ID Proof:</label>
+                    <div id="idproof" class="detail id-proof">
+                        {% if data.id_proof_url %}
+                            {% if data.idproof_is_pdf %}
+                                <iframe src="{{ data.id_proof_url }}" width="50%" height="50%"></iframe>
+                            {% else %}
+                                <img src="{{ data.id_proof_url }}" alt="ID Proof" width="50%" height="50%">
+                            {% endif %}
+                        {% else %}
+                            <p>No ID proof provided</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="detail-group">
+                    <label for="qualification1">Qualification 1:</label>
+                    <div id="qualification1" class="detail">{{ data.qualification1 }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="qualification2">Qualification 2:</label>
+                    <div id="qualification2" class="detail">{{ data.qualification2 }}</div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Category</title>
+    <style>
+        /* General reset and box-sizing for cleaner styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100%;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Full-page background */
+body {
+    background: linear-gradient(135deg, #fcfcfc,#1026b5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Container for the selection box */
+.container {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    width: 100%;
+}
+
+/* Header styling */
+.selection-box h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Dropdown select styling */
+.category-select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #1a1281;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    outline: none;
+    background-color: #f5f5f5;
+}
+
+/* Button styling */
+.submit-btn {
+    background-color: #1c37bc;
+    color: white;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+.submit-btn:hover {
+    background-color: #1a9243;
+}
+
+/* Additional responsive design considerations */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+    }
+    
+    .selection-box h1 {
+        font-size: 20px;
+    }
+    
+    .submit-btn {
+        font-size: 14px;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="selection-box">
+            <h1>Select a Category</h1>
+            <form method="post">
+                {% csrf_token %}
+                <label for="category">Choose your category:</label>
+                <select name="category_id" id="category" class="category-select">
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="submit-btn">Submit</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

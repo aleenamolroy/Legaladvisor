@@ -1,0 +1,348 @@
+{% extends 'advocate/advocate_navbar.html' %}
+{% load static %}
+
+{% block content %}
+<div class="profile-container">
+    <h1>Update Profile</h1>
+    {% if data.msg %}
+        <script>alert("{{ data.msg }}");</script>
+    {% endif %}
+    
+    <form method="post" enctype="multipart/form-data" id="updateProfileForm">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="img" class="file-label">Profile Image:</label>
+            <input type="file" name="img" id="img" class="file-input" accept="image/*">
+            <div class="file-preview" id="img-preview">
+                {% if data.profile.u_img %}
+                    <img src="{{ data.profile.u_img }}" alt="Current Profile Image" class="preview-img">
+                {% else %}
+                    <p>No image selected</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="idProofFile" class="file-label">ID Proof:</label>
+            <input type="file" name="idProofFile" id="idProofFile" class="file-input" accept=".pdf,image/*">
+            <div class="file-preview" id="id-proof-preview">
+                {% if data.profile.id_proof_url %}
+                    <a href="{{ data.profile.id_proof_url }}" target="_blank">View Current ID Proof</a>
+                {% else %}
+                    <p>No ID proof selected</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="profile-details">
+            <div class="detail-group">
+                <input type="text" name="enrollmentNumber" id="enrollmentNumber" value="{{ data.profile.enrollment_number }}" readonly class="disabled-field">
+            </div>
+            <div class="detail-group">
+                <input type="text" name="name" id="name" value="{{ data.profile.name }}">
+                <span id="nameError" class="error-message"></span>
+            </div>
+            
+            <div class="detail-group">
+                <input type="text" name="age" id="age" value="{{ data.profile.age }}">
+                <span id="ageError" class="error-message"></span>
+            </div>
+            
+            <div class="detail-group">
+                <input type="text" name="gender" id="gender" value="{{ data.profile.gender }}" readonly class="disabled-field">
+            </div>
+            
+            <div class="detail-group">
+                <input type="email" name="email" id="email" value="{{ data.profile.email }}">
+                <span id="emailError" class="error-message"></span>
+            </div>
+            
+            <div class="detail-group">
+                <input type="text" name="phone" id="phone" value="{{ data.profile.phone }}">
+                <span id="phoneError" class="error-message"></span>
+            </div>
+            
+            <div class="detail-group">
+                <input name="address" id="address" value="{{ data.profile.address }}">
+                <span id="addressError" class="error-message"></span>
+            </div>
+            
+            <div class="detail-group">
+                <input type="text" name="state" id="state" value="{{ data.profile.state }}" readonly class="disabled-field">
+                <span id="stateError" class="error-message"></span>
+            </div>
+            
+            <div class="detail-group">
+                <input type="text" name="district" id="district" value="{{ data.profile.district }}">
+                <span id="districtError" class="error-message"></span>
+            </div>
+            
+            <div class="detail-group">
+                <input type="text" name="pincode" id="pincode" value="{{ data.profile.pincode }}">
+                <span id="pincodeError" class="error-message"></span>
+            </div>
+            
+            <div class="detail-group">
+    <input type="text" name="taluk" id="taluk" placeholder="Taluk" value="{{ data.profile.taluk }}">
+    <span id="talukError" class="error-message"></span>
+</div>
+
+<div class="detail-group">
+    <input type="text" name="village" id="village" placeholder="Village" value="{{ data.profile.village }}">
+    <span id="villageError" class="error-message"></span>
+</div>
+
+            
+            <div class="detail-group">
+                <input type="text" name="idProofType" id="idProofType" value="{{ data.profile.id_proof_type }}">
+                <span id="idProofTypeError" class="error-message"></span>
+            </div>
+            
+            <div class="detail-group">
+                <input type="text" name="qualifications1" id="qualifications1" value="{{ data.profile.qualification1 }}">
+                <span id="qualification1Error" class="error-message"></span>
+            </div>
+            
+            <div class="detail-group">
+                <input type="text" name="qualifications2" id="qualifications2" value="{{ data.profile.qualification2 }}">
+                <span id="qualification2Error" class="error-message"></span>
+            </div>
+            
+            
+            <button type="submit" class="submit-btn">Update</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const imgInput = document.getElementById('img');
+        const idProofInput = document.getElementById('idProofFile');
+        const imgPreview = document.getElementById('img-preview');
+        const idProofPreview = document.getElementById('id-proof-preview');
+
+        imgInput.addEventListener('change', () => {
+            const file = imgInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imgPreview.innerHTML = `<img src="${e.target.result}" alt="Selected Profile Image" class="preview-img">`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imgPreview.innerHTML = `<p>No image selected</p>`;
+            }
+        });
+
+        idProofInput.addEventListener('change', () => {
+            const file = idProofInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (file.type === "application/pdf") {
+                        idProofPreview.innerHTML = `<a href="${e.target.result}" target="_blank">View Selected ID Proof</a>`;
+                    } else {
+                        idProofPreview.innerHTML = `<img src="${e.target.result}" alt="Selected ID Proof" class="preview-img">`;
+                    }
+                };
+                reader.readAsDataURL(file);
+            } else {
+                idProofPreview.innerHTML = `<p>No ID proof selected</p>`;
+            }
+        });
+
+        function validateName(name) {
+            const regex = /^[A-Za-z\s]{3,32}$/;
+            if (!name) {
+                return { isValid: false, message: 'Name is required' };
+            } else if (!regex.test(name)) {
+                return { isValid: false, message: 'Name must contain letters and spaces' };
+            }
+            return { isValid: true, message: '' };
+        }
+
+        function validateAge(age) {
+            if (!age) {
+                return { isValid: false, message: 'Age is required' };
+            } else if (isNaN(age) || age < 18 || age > 100) {
+                return { isValid: false, message: 'Age must be between 18 and 100' };
+            }
+            return { isValid: true, message: '' };
+        }
+
+        function validateEmail(email) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email) {
+                return { isValid: false, message: 'Email is required' };
+            } else if (!regex.test(email)) {
+                return { isValid: false, message: 'Invalid email format' };
+            }
+            return { isValid: true, message: '' };
+        }
+
+        function validatePhone(phone) {
+            const regex = /^[789]{1}[0-9]{9}$/;
+            if (!phone) {
+                return { isValid: false, message: 'Phone number is required' };
+            } else if (!regex.test(phone)) {
+                return { isValid: false, message: 'Invalid phone number' };
+            }
+            return { isValid: true, message: '' };
+        }
+        function validateDistrict(district) {
+             const validDistricts = ['Alappuzha', 'Ernakulam', 'Idukki', 'Kannur', 'Kasaragod',
+                                      'Kollam', 'Kottayam', 'Kozhikode', 'Malappuram', 'Palakkad',
+                                        'Pathanamthitta', 'Thiruvananthapuram', 'Thrissur', 'Wayanad'];
+         if (!district) {
+            return { isValid: false, message: 'District is required' };
+        } else if (!validDistricts.includes(district)) {
+            return { isValid: false, message: 'Invalid district' };
+         }
+        return { isValid: true, message: '' };
+        }
+        function validatePincode(pincode) {
+            const regex = /^[1-9]{1}[0-9]{5}$/;
+            if (!pincode) {
+                return { isValid: false, message: 'Pincode is required' };
+            } else if (!regex.test(pincode)) {
+                return { isValid: false, message: 'Invalid pincode' };
+            }
+            return { isValid: true, message: '' };
+        }
+        function validateTaluk(taluk) {
+    const regex = /^[A-Za-z\s]+$/;
+    if (!taluk) {
+        return { isValid: false, message: 'Taluk is required' };
+    } else if (!regex.test(taluk)) {
+        return { isValid: false, message: 'Taluk must contain only characters' };
+    }
+    return { isValid: true, message: '' };
+}
+
+function validateVillage(village) {
+    const regex = /^[A-Za-z\s]+$/;
+    if (!village) {
+        return { isValid: false, message: 'Village is required' };
+    } else if (!regex.test(village)) {
+        return { isValid: false, message: 'Village must contain only characters' };
+    }
+    return { isValid: true, message: '' };
+}
+
+        function validateIdProofType(idProofType) {
+            const validTypes = ['Aadhaar', 'VoterID', 'Passport', 'DrivingLicense','PAN'];
+            if (!idProofType) {
+                return { isValid: false, message: 'ID Proof Type is required' };
+            } else if (!validTypes.includes(idProofType)) {
+                return { isValid: false, message: 'Invalid ID Proof Type' };
+            }
+            return { isValid: true, message: '' };
+        }
+        function validateQualification(qualification) {
+    const regex = /^[A-Za-z\s]+$/;
+    if (!qualification) {
+        return { isValid: false, message: 'Qualification is required' };
+    } else if (!regex.test(qualification)) {
+        return { isValid: false, message: 'Qualification must contain only characters' };
+    }
+    return { isValid: true, message: '' };
+}
+        function attachInputValidation(inputElement, validationFunction, errorElementId) {
+            inputElement.addEventListener('input', () => {
+                const { isValid, message } = validationFunction(inputElement.value);
+                document.getElementById(errorElementId).textContent = message;
+                if (isValid) {
+                    inputElement.classList.remove('invalid');
+                    inputElement.classList.add('valid');
+                } else {
+                    inputElement.classList.remove('valid');
+                    inputElement.classList.add('invalid');
+                }
+            });
+        }
+
+        attachInputValidation(document.getElementById('name'), validateName, 'nameError');
+        attachInputValidation(document.getElementById('age'), validateAge, 'ageError');
+        attachInputValidation(document.getElementById('email'), validateEmail, 'emailError');
+        attachInputValidation(document.getElementById('phone'), validatePhone, 'phoneError');
+        attachInputValidation(document.getElementById('pincode'), validatePincode, 'pincodeError');
+        attachInputValidation(document.getElementById('taluk'), validateTaluk, 'talukError');
+        attachInputValidation(document.getElementById('village'), validateVillage, 'villageError');
+        attachInputValidation(document.getElementById('idProofType'), validateIdProofType, 'idProofTypeError');
+        attachInputValidation(document.getElementById('district'), validateDistrict, 'districtError');
+        attachInputValidation(document.getElementById('qualifications1'), validateQualification, 'qualification1Error');
+        attachInputValidation(document.getElementById('qualifications2'), validateQualification, 'qualification2Error');
+        document.getElementById('updateProfileForm').addEventListener('submit', function(event) {
+            let isValid = true;
+
+            const nameInput = document.getElementById('name');
+            const ageInput = document.getElementById('age');
+            const emailInput = document.getElementById('email');
+            const phoneInput = document.getElementById('phone');
+            const district = document.getElementById('district').value;
+            const pincodeInput = document.getElementById('pincode');
+            const idProofTypeInput = document.getElementById('idProofType');
+
+            const nameError = validateName(nameInput.value);
+            document.getElementById('nameError').textContent = nameError.message;
+            if (!nameError.isValid) isValid = false;
+
+            const ageError = validateAge(ageInput.value);
+            document.getElementById('ageError').textContent = ageError.message;
+            if (!ageError.isValid) isValid = false;
+
+            const emailError = validateEmail(emailInput.value);
+            document.getElementById('emailError').textContent = emailError.message;
+            if (!emailError.isValid) isValid = false;
+
+            const phoneError = validatePhone(phoneInput.value);
+            document.getElementById('phoneError').textContent = phoneError.message;
+            if (!phoneError.isValid) isValid = false;
+            if (!districtValidation.isValid) {
+        document.getElementById('districtError').innerText = districtValidation.message;
+        event.preventDefault();
+    }
+            const pincodeError = validatePincode(pincodeInput.value);
+            document.getElementById('pincodeError').textContent = pincodeError.message;
+            if (!pincodeError.isValid) isValid = false;
+
+            const idProofTypeError = validateIdProofType(idProofTypeInput.value);
+            document.getElementById('idProofTypeError').textContent = idProofTypeError.message;
+            if (!idProofTypeError.isValid) isValid = false;
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    });
+</script>
+
+<style>
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .file-label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    .file-input {
+        display: block;
+        margin-bottom: 10px;
+    }
+    .file-preview {
+        margin-top: 10px;
+    }
+    .preview-img {
+        max-width: 200px;
+        height: auto;
+    }
+    .disabled-field {
+        background-color: #f0f0f0;
+        pointer-events: none;
+    }
+    .error-message {
+        color: red;
+        font-size: 12px;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,435 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Legal Advisor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="keywords" content="Custom Signup Form Responsive, Login Form Web Template, Flat Pricing Tables, Flat Drop-Downs, Sign-Up Web Templates, Flat Web Templates, Login Sign-up Responsive Web Template, Smartphone Compatible Web Template, Free Web Designs for Nokia, Samsung, LG, Sony Ericsson, Motorola Web Design">
+    <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+    <link rel="stylesheet" href="{% static 'login/css/style.css' %}" type="text/css" media="all">
+    <link rel="stylesheet" href="{% static 'login/css/jquery-ui.css' %}" type="text/css" media="all">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .form-container {
+            display: none;
+        }
+        .qualification-field {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .qualification-field input {
+            margin-right: 10px;
+            flex-grow: 1;
+        }
+        .qualification-field .remove-btn,
+        .add-btn {
+            background-color: transparent;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .qualification-field .remove-btn {
+            color: #ff4d4d;
+        }
+        .add-btn {
+            color: #28a745;
+            margin-left: 5px;
+        }
+        .error-message {
+            color: red;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    {% if msg %}
+    <script>
+        alert("{{msg}}");
+    </script>
+    {% endif %}
+
+    <h1>User Registration</h1>
+
+    <div class="containerw3layouts-agileits">
+        <div class="w3imageaits">
+            <img class="user" src="{% static 'login/images/user.png' %}" alt="Custom Signup Form">
+            <h2>Let's get you set up</h2>
+            <p>It should only take you a minute to connect</p><br>
+            <br>
+            <a href="{% url 'ind' %}" style="color: aliceblue;">
+                <p>HOME</p>
+            </a>
+        </div>
+
+        <script type='text/javascript'>
+            function preview_image(event) {
+                var reader = new FileReader();
+                reader.onload = function () {
+                    var output = document.getElementById('output_image');
+                    output.src = reader.result;
+                }
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        </script>
+
+        <div class="aitsloginwthree w3layouts agileits">
+            <form id="mainForm" action="{% url 'register' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <img src="" width="150px;" height="150px;" id="output_image">
+                <input type="file" name="img" placeholder="img" accept="image/*" onchange="preview_image(event)" required>
+                <br><br>
+                <input type="text" name="name" placeholder="User Name" pattern="[A-Za-z\s]{3,32}">
+                <div id="nameError" class="error-message"></div>
+
+                <input type="number" name="age" placeholder="Age">
+                <div id="ageError" class="error-message"></div>
+
+                <div class="radio-btns agileits w3layouts">
+                    <div class="cc-selector wthreeselector">
+                        <p>Gender</p>
+                    </div>
+                    <div class="cc-selector wthreeselector">
+                        <input id="visa" type="radio" name="gender" value="male">male
+                        <label class="drinkcard-cc visa" for="visa"></label>
+                    </div>
+                    <div class="cc-selector wthreeselector">
+                        <input id="mastercard" type="radio" name="gender" value="female">female
+                        <label class="drinkcard-cc mastercard" for="mastercard"></label>
+                    </div>
+                </div>
+                <div id="genderError" class="error-message"></div>
+
+                <input class="fill email" type="email" name="email" placeholder="Email">
+                <div id="emailError" class="error-message"></div>
+
+                <input class="fill tel" type="text" name="phone" maxlength="10" pattern="[789]{1}[0-9]{9}" title="First number should be within 7-9 and total 10 digits" placeholder="Contact No.">
+                <div id="phoneError" class="error-message"></div>
+
+                <input type="text" name="address" placeholder="House Name">
+                <div id="addressError" class="error-message"></div>
+
+                <div class="form-group">
+                    <select id="state" name="state">
+                        <option value="">Select State</option>
+                        <option value="Kerala">Kerala</option>
+                    </select>
+                    <div id="stateError" class="error-message"></div>
+                </div>
+
+                <div class="form-group">
+                    <select id="district" name="district">
+                        <option value="">Select District</option>
+                        <!-- District options will be populated based on the selected state -->
+                    </select>
+                    <div id="districtError" class="error-message"></div>
+                </div>
+
+                <input type="text" name="pincode" placeholder="Pincode">
+                <div id="pincodeError" class="error-message"></div>
+
+                <div class="form-group">
+                    <label for="idProofType">Select ID Proof Type:</label>
+                    <select id="idProofType" name="idProofType">
+                        <option value="">Select ID Proof</option>
+                        <option value="Aadhar">Aadhar</option>
+                        <option value="PAN">PAN</option>
+                        <option value="Passport">Passport</option>
+                        <option value="Driving License">Driving License</option>
+                        <option value="Voter ID">Voter ID</option>
+                    </select>
+                    <div id="idProofTypeError" class="error-message"></div>
+                </div>
+                <div class="form-group">
+                    <label for="idProofFile">Upload Proof:</label>
+                    <input type="file" id="idProofFile" name="idProofFile" accept=".pdf, .jpg, .jpeg, .png" placeholder="Upload ID proof">
+                    <div id="idProofFileError" class="error-message"></div>
+                </div>
+
+                <input type="password" name="password" placeholder="Password">
+                <div id="passwordError" class="error-message"></div>
+
+                <h2>Select Your Role</h2>
+                <div class="form-group">
+                    <label>
+                        <input type="radio" name="userType" value="advocate" onclick="showForm()"> Advocate
+                    </label>
+                    <label>
+                        <input type="radio" name="userType" value="client" onclick="showForm()"> Client
+                    </label>
+                    <div id="userTypeError" class="error-message"></div>
+                </div>
+
+                <div id="advocateFields" class="form-container">
+                    <div class="form-group">
+                        <input type="text" id="enrollmentNumber" name="enrollmentNumber" placeholder="Enrollment Number" pattern="[A-Z]/\d{4}/\d{4}" >
+                        <div id="enrollmentNumberError" class="error-message"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="qualifications">Qualifications</label>
+                        <input type="text" name="qualifications1" placeholder="Qualification 1">
+                        <div id="qualificationsError" class="error-message"></div>
+                        <input type="text" name="qualifications2" placeholder="Qualification 2">
+                    </div>
+                </div>
+
+                <div class="send-button wthree agileits">
+                    <input type="submit" name="submit">
+                </div>
+            </form>
+        </div>
+
+        <div class="clear"></div>
+    </div>
+
+    <div class="w3lsfooteragileits">
+        <p>&copy; 2020 Legal Advisor. All Rights Reserved</p>
+    </div>
+
+    <script>
+        // District options for the state selection
+        const districtOptions = {
+            Kerala: ["Alappuzha", "Ernakulam", "Idukki", "Kannur", "Kasaragod", "Kollam", "Kottayam", "Kozhikode", "Malappuram", "Palakkad", "Pathanamthitta", "Thiruvananthapuram", "Thrissur", "Wayanad"]
+        };
+    
+        // Populate district options based on selected state
+        document.getElementById('state').addEventListener('change', function() {
+            const state = this.value;
+            const districtSelect = document.getElementById('district');
+            districtSelect.innerHTML = '<option value="">Select District</option>';
+    
+            if (state in districtOptions) {
+                districtOptions[state].forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    districtSelect.appendChild(option);
+                });
+            }
+        });
+    
+        // Show/hide advocate fields based on selected role
+        function showForm() {
+            const advocateFields = document.getElementById("advocateFields");
+            const selectedRole = document.querySelector('input[name="userType"]:checked').value;
+    
+            advocateFields.style.display = selectedRole === "advocate" ? "block" : "none";
+        }
+    
+        // Generic field validation function
+        function validateField(field, errorElementId, validationFunction) {
+            const errorElement = document.getElementById(errorElementId);
+            const validationResult = validationFunction(field.value);
+            if (!validationResult.isValid) {
+                errorElement.textContent = validationResult.message;
+                field.classList.add('error');
+            } else {
+                errorElement.textContent = '';
+                field.classList.remove('error');
+            }
+        }
+    
+        // Validation functions for various fields
+        function validateName(name) {
+            const regex = /^[A-Za-z\s]{3,32}$/;
+            if (!name) {
+                return { isValid: false, message: 'Name is required' };
+            } else if (!regex.test(name)) {
+                return { isValid: false, message: 'Name must contain letters and spaces' };
+            }
+            return { isValid: true, message: '' };
+        }
+    
+        function validateAge(age) {
+            if (!age) {
+                return { isValid: false, message: 'Age is required' };
+            } else if (isNaN(age) || age < 18 || age > 100) {
+                return { isValid: false, message: 'Age must be greater than 18' };
+            }
+            return { isValid: true, message: '' };
+        }
+    
+        function validateGender(gender) {
+            if (!gender) {
+                return { isValid: false, message: 'Gender is required' };
+            }
+            return { isValid: true, message: '' };
+        }
+    
+        function validateEmail(email) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email) {
+                return { isValid: false, message: 'Email is required' };
+            } else if (!regex.test(email)) {
+                return { isValid: false, message: 'Invalid email format' };
+            }
+            return { isValid: true, message: '' };
+        }
+    
+        function validatePhone(phone) {
+            const regex = /^[789]{1}[0-9]{9}$/;
+            if (!phone) {
+                return { isValid: false, message: 'Phone number is required' };
+            } else if (!regex.test(phone)) {
+                return { isValid: false, message: 'Phone number must start with 7, 8, or 9 and be 10 digits long' };
+            }
+            return { isValid: true, message: '' };
+        }
+    
+        function validateAddress(address) {
+            if (!address) {
+                return { isValid: false, message: 'Address is required' };
+            }
+            return { isValid: true, message: '' };
+        }
+    
+        function validateState(state) {
+            if (!state) {
+                return { isValid: false, message: 'State is required' };
+            }
+            return { isValid: true, message: '' };
+        }
+    
+        function validateDistrict(district) {
+            if (!district) {
+                return { isValid: false, message: 'District is required' };
+            }
+            return { isValid: true, message: '' };
+        }
+    
+        function validatePincode(pincode) {
+            if (!pincode) {
+                return { isValid: false, message: 'Pincode is required' };
+            } else if (!/^\d{6}$/.test(pincode)) {
+                return { isValid: false, message: 'Pincode must be 6 digits' };
+            }
+            return { isValid: true, message: '' };
+        }
+    
+        function validateIdProofType(idProofType) {
+            if (!idProofType) {
+                return { isValid: false, message: 'ID Proof Type is required' };
+            }
+            return { isValid: true, message: '' };
+        }
+    
+        function validateIdProofFile(idProofFile) {
+            if (!idProofFile) {
+                return { isValid: false, message: 'ID Proof File is required' };
+            }
+            return { isValid: true, message: '' };
+        }
+    
+        function validatePassword(password) {
+            if (!password) {
+                return { isValid: false, message: 'Password is required' };
+            } else if (password.length < 6) {
+                return { isValid: false, message: 'Password must be at least 6 characters long' };
+            }
+            return { isValid: true, message: '' };
+        }
+    
+        function validateEnrollmentNumber(enrollmentNumber) {
+            const regex = /^[A-Z]\/\d{4}\/\d{4}$/;
+            if (!enrollmentNumber) {
+                return { isValid: false, message: 'Enrollment Number is required' };
+            } else if (!regex.test(enrollmentNumber)) {
+                return { isValid: false, message: 'Invalid Enrollment Number format' };
+            }
+            return { isValid: true, message: '' };
+        }
+    
+        // Attach input event listeners to form fields for real-time validation
+        document.getElementById('mainForm').addEventListener('input', function(event) {
+            const field = event.target;
+            switch (field.name) {
+                case 'name':
+                    validateField(field, 'nameError', validateName);
+                    break;
+                case 'age':
+                    validateField(field, 'ageError', validateAge);
+                    break;
+                case 'gender':
+                    validateField(field, 'genderError', validateGender);
+                    break;
+                case 'email':
+                    validateField(field, 'emailError', validateEmail);
+                    break;
+                case 'phone':
+                    validateField(field, 'phoneError', validatePhone);
+                    break;
+                case 'address':
+                    validateField(field, 'addressError', validateAddress);
+                    break;
+                case 'state':
+                    validateField(field, 'stateError', validateState);
+                    break;
+                case 'district':
+                    validateField(field, 'districtError', validateDistrict);
+                    break;
+                case 'pincode':
+                    validateField(field, 'pincodeError', validatePincode);
+                    break;
+                case 'idProofType':
+                    validateField(field, 'idProofTypeError', validateIdProofType);
+                    break;
+                case 'idProofFile':
+                    validateField(field, 'idProofFileError', validateIdProofFile);
+                    break;
+                case 'password':
+                    validateField(field, 'passwordError', validatePassword);
+                    break;
+                case 'enrollmentNumber':
+                    validateField(field, 'enrollmentNumberError', validateEnrollmentNumber);
+                    break;
+                default:
+                    break;
+            }
+        });
+    
+        // Handle form submission with validation checks
+        document.getElementById('mainForm').addEventListener('submit', function(event) {
+            const selectedRole = document.querySelector('input[name="userType"]:checked').value;
+            const fields = [
+                { name: 'name', validationFunction: validateName, errorElementId: 'nameError' },
+                { name: 'age', validationFunction: validateAge, errorElementId: 'ageError' },
+                { name: 'gender', validationFunction: validateGender, errorElementId: 'genderError' },
+                { name: 'email', validationFunction: validateEmail, errorElementId: 'emailError' },
+                { name: 'phone', validationFunction: validatePhone, errorElementId: 'phoneError' },
+                { name: 'address', validationFunction: validateAddress, errorElementId: 'addressError' },
+                { name: 'state', validationFunction: validateState, errorElementId: 'stateError' },
+                { name: 'district', validationFunction: validateDistrict, errorElementId: 'districtError' },
+                { name: 'pincode', validationFunction: validatePincode, errorElementId: 'pincodeError' },
+                { name: 'idProofType', validationFunction: validateIdProofType, errorElementId: 'idProofTypeError' },
+                { name: 'idProofFile', validationFunction: validateIdProofFile, errorElementId: 'idProofFileError' },
+                { name: 'password', validationFunction: validatePassword, errorElementId: 'passwordError' }
+            ];
+    
+            if (selectedRole === 'advocate') {
+                fields.push({ name: 'enrollmentNumber', validationFunction: validateEnrollmentNumber, errorElementId: 'enrollmentNumberError' });
+            }
+    
+            let isValid = true;
+            fields.forEach(field => {
+                const fieldElement = document.querySelector(`[name="${field.name}"]`);
+                const validationResult = field.validationFunction(fieldElement.value);
+                if (!validationResult.isValid) {
+                    document.getElementById(field.errorElementId).textContent = validationResult.message;
+                    fieldElement.classList.add('error');
+                    isValid = false;
+                } else {
+                    document.getElementById(field.errorElementId).textContent = '';
+                    fieldElement.classList.remove('error');
+                }
+            });
+    
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    </script>
+    
+</body>
+</html>

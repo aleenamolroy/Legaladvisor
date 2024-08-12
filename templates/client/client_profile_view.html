@@ -1,0 +1,79 @@
+{% extends 'client/client_navbar.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="profile-container">
+        <h1>Client Profile</h1>
+        {% if msg %}
+            <p>{{ msg }}</p>
+        {% else %}
+            <img src="{{ profile_data.u_img }}" alt="Profile Image" class="profile-img">
+            <div class="profile-details">
+                <div class="detail-group">
+                    <label for="name">Name:</label>
+                    <div id="name" class="detail">{{ profile_data.name }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="age">Age:</label>
+                    <div id="age" class="detail">{{ profile_data.age }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="gender">Gender:</label>
+                    <div id="gender" class="detail">{{ profile_data.gender }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="email">Email:</label>
+                    <div id="email" class="detail">{{ profile_data.email }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="phone">Phone:</label>
+                    <div id="phone" class="detail">{{ profile_data.phone }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="address">Address:</label>
+                    <div id="address" class="detail">{{ profile_data.address }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="state">State:</label>
+                    <div id="state" class="detail">{{ profile_data.state }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="city">District:</label>
+                    <div id="city" class="detail">{{ profile_data.district }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="pincode">Pincode:</label>
+                    <div id="pincode" class="detail">{{ profile_data.pincode }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="taluk">Taluk:</label>
+                    <div id="taluk" class="detail">{{ profile_data.taluk }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="village">Village:</label>
+                    <div id="village" class="detail">{{ profile_data.village }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="idproof_type">ID Proof Type:</label>
+                    <div id="idproof_type" class="detail">{{ profile_data.id_proof_type }}</div>
+                </div>
+                <div class="detail-group">
+                    <label for="idproof">ID Proof:</label>
+                    <div id="idproof" class="detail id-proof">
+                        {% if profile_data.id_proof_url %}
+                            {% if idproof_is_pdf %}
+                                <iframe src="{{ profile_data.id_proof_url }}" width="50%" height="50%"></iframe>
+                            {% else %}
+                                <img src="{{ profile_data.id_proof_url }}" alt="ID Proof" width="50%" height="50%">
+                            {% endif %}
+                        {% else %}
+                            <p>No ID proof provided</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+ {% endblock %}
+  

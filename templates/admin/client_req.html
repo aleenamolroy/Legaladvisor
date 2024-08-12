@@ -1,0 +1,78 @@
+{% extends 'admin/admin_navbar_sidebar.html' %}
+{% load static %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Client Request</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Client Request List</h3>
+                </div>
+                <div class="card-body">
+                    {% if msgg %}
+                        <div class="alert alert-warning">
+                            {{ msgg }}
+                        </div>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Client ID</th>
+                                        <th>Name</th>
+                                        <th>Image</th>
+                                        <th>Age</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>State</th>
+                                        <th>District</th>
+                                        <th>Pincode</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in data %}
+                                        <tr>
+                                        
+                                                
+                                            <td>{{ row.c_id }}</td>
+                                            <td>{{ row.u_name }}</td>
+                                            <td>
+                                                <img src="{{ MEDIA_URL }}{{ row.u_img }}" alt="Advocate Image" style="width:100px;height:100px;">
+                                                
+                                            </td>
+                                            <td>{{ row.age }}</td>
+                                            <td>{{ row.email }}</td>
+                                            <td>{{ row.phone }}</td>
+                                            <td>{{ row.state }}</td>
+                                            <td>{{ row.district }}</td>
+                                            <td>{{ row.pincode }}</td>
+                                            <td><span class="badge badge-warning">Pending</span></td>
+                                            <td>
+                                                <a href="{% url 'action_client' %}?reg_id={{ row.u_id }}&st=Approve" class="btn btn-success btn-sm">Approve</a>
+                                                <a href="{% url 'action_client' %}?reg_id={{ row.u_id }}&st=Reject" class="btn btn-danger btn-sm">Reject</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
