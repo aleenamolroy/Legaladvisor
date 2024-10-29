@@ -32,9 +32,10 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
      'home',
+     'channels',
 ]
 SITE_ID = 1
-
+ASGI_APPLICATION = 'Legal_advisor.asgi.application'
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
@@ -87,6 +88,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Legal_advisor.wsgi.application'
 
+# Razorpay API Keys Y6BonJIr6wHpNMK4eo1NHYoo
+RAZORPAY_KEY_ID = 'rzp_test_AnXj68fT4zKwe0'
+RAZORPAY_KEY_SECRET = 'jo7RcNBDpB5qIYJ3NUBKHeVk'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -99,6 +103,9 @@ DATABASES = {
         'PASSWORD':"",  
         'HOST': 'localhost',  # The IP address of your MySQL server (usually localhost or 127.0.0.1 for XAMPP)
         'PORT': '3306',  # The port your MySQL server is running on (3306 is the default port for MySQL)
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
     }
 }
 
@@ -120,7 +127,11 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/

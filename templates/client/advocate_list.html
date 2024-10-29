@@ -2,89 +2,207 @@
 {% load static %}
 
 {% block content %}
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Find Your Advocate</h2>
 
-<div class="container mt-4">
-    <h1 class="mb-4">Advocate List</h1>
-    <table class="table table-bordered">
-        <thead class="thead-dark">
-            <tr>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Gender</th>
-                <th>Age</th>
-                <th>Address</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>Category</th>
-                <th>Average Rating</th>
-                <th>Review Count</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for advocate in advocates %}
-            <tr>
-                <td><img src="{{ advocate.u_img }}" alt="Image" class="img-fluid" width="50"></td>
-                <td>{{ advocate.u_name }}</td>
-                <td>{{ advocate.gender }}</td>
-                <td>{{ advocate.age }}</td>
-                <td>{{ advocate.address }}</td>
-                <td>{{ advocate.phone }}</td>
-                <td>{{ advocate.email }}</td>
-                <td>{{ advocate.category_name }}</td>
-                <td>
-                    <div class="stars">
-                        {% for i in star_range %}
-                            {% if i <= advocate.average_rating %}
-                                <i class="fas fa-star text-warning"></i>
-                            {% else %}
-                                <i class="far fa-star text-muted"></i>
-                            {% endif %}
-                        {% endfor %}
+    <!-- Search and Filter Form -->
+    <div class="card mb-5 shadow-sm">
+        <div class="card-body">
+            <form method="get" action="{% url 'advocate_list' %}">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="district" class="form-label">District</label>
+                        <select name="district" id="district" class="form-select">
+                            <option value="">All Districts</option>
+                            {% for district in districts %}
+                                <option value="{{ district }}" {% if current_filters.district == district %}selected{% endif %}>{{ district }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                    
-                    
-                    
-                    ({{ advocate.average_rating|default:"N/A" }})
-                </td>
-                <td>{{ advocate.review_count|default:0 }}</td>
-                <td>
-                    
-                        {% if advocate.request_status == 0 %}
-                            <button type="button" class="btn btn-warning" disabled>Pending</button>
-                        {% elif advocate.request_status == 1 %}
-                            <button type="button" class="btn btn-success" disabled>Accepted</button>
-                        {% else %}
-                            <button type="button" class="btn btn-primary view-profile" data-id="{{ advocate.u_id }}" onclick="sendRequest({{ advocate.u_id }});">Connect</button>
+                    <div class="col-md-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select name="category" id="category" class="form-select">
+                            <option value="">All Categories</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" {% if current_filters.category == category.id %}selected{% endif %}>{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="rating" class="form-label">Rating</label>
+                        <select name="rating" id="rating" class="form-select">
+                            <option value="">All Ratings</option>
+                            {% for star in star_range %}
+                                <option value="{{ star }}" {% if current_filters.rating == star|stringformat:"i" %}selected{% endif %}>{{ star }}+ Stars</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="sort_by" class="form-label">Sort By</label>
+                        <select name="sort_by" id="sort_by" class="form-select">
+                            <option value="rating" {% if current_filters.sort_by == 'rating' %}selected{% endif %}>Rating</option>
+                            <option value="name" {% if current_filters.sort_by == 'name' %}selected{% endif %}>Name</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label invisible">Apply</label>
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Advocate List -->
+    <div class="row advocate-list g-4">
+        {% for advocate in page_obj %}
+            <div class="col-md-4">
+                <div class="card h-100 advocate-card shadow-sm">
+                    <img src="{{ advocate.u_img }}" class="card-img-top advocate-img" alt="{{ advocate.u_name }}">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ advocate.u_name }}</h5>
+                        <p class="card-text">
+                            <i class="fas fa-gavel me-2"></i>{{ advocate.category_name }}<br>
+                            <i class="fas fa-map-marker-alt me-2"></i>{{ advocate.district }}<br>
+                            <i class="fas fa-star me-2"></i>{{ advocate.average_rating }} ({{ advocate.review_count }} reviews)<br>
+                            <i class="fas fa-phone me-2"></i>{{ advocate.phone }}<br>
+                            <i class="fas fa-envelope me-2"></i>{{ advocate.email }}
+                        </p>
+                        {% if advocate.request_status != 2 %}
+                            <button class="btn btn-primary mt-auto view-profile-btn" data-advocate-id="{{ advocate.u_id }}">View Profile</button>
                         {% endif %}
-                  
-                                    </td>
-            </tr>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center" role="alert">
+                    No advocates found matching your criteria.
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination controls -->
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center mt-4">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if current_filters.district %}&district={{ current_filters.district }}{% endif %}{% if current_filters.category %}&category={{ current_filters.category }}{% endif %}{% if current_filters.rating %}&rating={{ current_filters.rating }}{% endif %}{% if current_filters.sort_by %}&sort_by={{ current_filters.sort_by }}{% endif %}" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_filters.district %}&district={{ current_filters.district }}{% endif %}{% if current_filters.category %}&category={{ current_filters.category }}{% endif %}{% if current_filters.rating %}&rating={{ current_filters.rating }}{% endif %}{% if current_filters.sort_by %}&sort_by={{ current_filters.sort_by }}{% endif %}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&laquo;&laquo;</span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">&laquo;</span>
+                </li>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}{% if current_filters.district %}&district={{ current_filters.district }}{% endif %}{% if current_filters.category %}&category={{ current_filters.category }}{% endif %}{% if current_filters.rating %}&rating={{ current_filters.rating }}{% endif %}{% if current_filters.sort_by %}&sort_by={{ current_filters.sort_by }}{% endif %}">{{ num }}</a></li>
+                {% endif %}
             {% endfor %}
-        </tbody>
-    </table>
+            
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_filters.district %}&district={{ current_filters.district }}{% endif %}{% if current_filters.category %}&category={{ current_filters.category }}{% endif %}{% if current_filters.rating %}&rating={{ current_filters.rating }}{% endif %}{% if current_filters.sort_by %}&sort_by={{ current_filters.sort_by }}{% endif %}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if current_filters.district %}&district={{ current_filters.district }}{% endif %}{% if current_filters.category %}&category={{ current_filters.category }}{% endif %}{% if current_filters.rating %}&rating={{ current_filters.rating }}{% endif %}{% if current_filters.sort_by %}&sort_by={{ current_filters.sort_by }}{% endif %}" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&raquo;</span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">&raquo;&raquo;</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script >
-function sendRequest(advocate_id) {
-    $.ajax({
-        url: '{% url "send_request" %}',
-        method: 'POST',
-        data: {
-            'advocate_id': advocate_id,
-            'csrfmiddlewaretoken': '{{ csrf_token }}'
-        },
-        success: function(response) {
-            alert('Request sent successfully!');
-            $('button[data-id="' + advocate_id + '"]').replaceWith('<button type="button" class="btn btn-warning" disabled>Pending</button>');
-        },
-        error: function(xhr, status, error) {
-            alert('Failed to send request.');
-        }
+<style>
+    .advocate-list {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .advocate-card {
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+    .advocate-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    .advocate-img {
+        height: 200px;
+        object-fit: cover;
+    }
+    .card-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    .card-text {
+        font-size: 0.9rem;
+    }
+    .view-profile-btn {
+        align-self: center;
+        width: 100%;
+    }
+    .form-label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    .card-body {
+        padding: 1.5rem;
+    }
+    .form-select, .btn-primary {
+        width: 100%;
+        height: 38px;
+    }
+    .row.g-3 {
+        align-items: flex-end;
+    }
+
+    /* Add styles for the modal */
+    .modal-body {
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+</style>
+
+<!-- Add Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<!-- Add Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Add Bootstrap JS and Popper.js -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('.view-profile-btn').click(function() {
+        var advocateId = $(this).data('advocate-id');
+        window.location.href = '/client_home/advocate_profile/' + advocateId + '/';
     });
-}
+});
 </script>
+
 {% endblock %}

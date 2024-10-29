@@ -1,0 +1,139 @@
+{% extends 'advocate/advocate_navbar.html' %}
+
+{% block content %}
+<br><br>
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg rounded border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h2 class="mb-0">Case Details</h2>
+                </div>
+                <div class="card-body p-4">
+                    <h3 class="card-title mb-4 text-primary">{{ case.case_name }}</h3>
+                    
+                    <!-- Two-Column Layout for Case Information and Details -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title text-secondary">Case Information</h5>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item"><strong>Description:</strong> {{ case.case_description }}</li>
+                                        <li class="list-group-item"><strong>Legal Issue:</strong> {{ case.legal_issue }}</li>
+                                        <li class="list-group-item"><strong>Incident Date:</strong> {{ case.incident_date }}</li>
+                                        <li class="list-group-item"><strong>Service Type:</strong> {{ case.service_type }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title text-secondary">Case Details</h5>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item"><strong>Expected Outcome:</strong> {{ case.expected_outcome }}</li>
+                                        <li class="list-group-item"><strong>Priority Level:</strong> <span class="badge bg-{{ case.priority_level|lower }}">{{ case.priority_level }}</span></li>
+                                        <li class="list-group-item"><strong>Deadline:</strong> {{ case.deadline }}</li>
+                                        <li class="list-group-item"><strong>Case Date:</strong> {{ case.case_date }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                   <!-- Two-Column Layout for Documents & Status and Client Information -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-secondary">Documents & Status</h5>
+                <p><strong>Supporting Documents:</strong></p>
+                {% if case.supporting_documents %}
+                    <ul class="list-group list-group-flush">
+                        {% for document in case.supporting_documents %}
+                            <li class="list-group-item">
+                                <a href="{{ MEDIA_URL }}{{ document }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-file-alt me-2"></i>View Document {{ forloop.counter }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">Not provided</p>
+                {% endif %}
+                <p class="mt-3"><strong>Status:</strong> <span class="badge bg-{{ case.status|lower }}">{{ case.status }}</span></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-secondary">Client Information</h5>
+                <p><strong>Name:</strong> {{ case.client_name }}</p>
+                <p><strong>Email:</strong> <a href="mailto:{{ case.client_email }}" class="text-decoration-none">{{ case.client_email }}</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+                    <!-- Action Buttons -->
+                    <div class="text-center mt-4">
+                        <a href="{% url 'client_request' %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Pending Cases
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<!-- Custom CSS -->
+<style>
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+    .list-group-item {
+        font-size: 1rem;
+        padding: 0.75rem 1.25rem;
+    }
+    .badge {
+        font-size: 0.9rem;
+    }
+    .badge-high {
+        background-color: #dc3545;
+    }
+    .badge-medium {
+        background-color: #ffc107;
+    }
+    .badge-low {
+        background-color: #28a745;
+    }
+    .badge-pending {
+        background-color: #17a2b8;
+    }
+    .badge-in-progress {
+        background-color: #007bff;
+    }
+    .badge-completed {
+        background-color: #28a745;
+    }
+    .card-body p {
+        margin-bottom: 0.5rem;
+    }
+    .btn-outline-primary {
+        border-color: #007bff;
+        color: #007bff;
+    }
+    .btn-outline-primary:hover {
+        background-color: #007bff;
+        color: #fff;
+    }
+</style>
+{% endblock %}

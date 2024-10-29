@@ -1,0 +1,118 @@
+{% extends 'client/client_navbar.html' %}
+{% load static %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">IPC Section Search</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <!-- Search Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Search IPC Sections</h3>
+                </div>
+                <div class="card-body">
+                    <form method="GET" action="{% url 'ipc_search' %}" class="form-horizontal">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-8">
+                                <div class="form-group row">
+                                    <label for="ipc_section" class="col-sm-3 col-form-label">Enter Section Number or Keyword</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" id="ipc_section" name="ipc_section" placeholder="e.g., 302 or theft" value="{{ request.GET.ipc_section }}" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-9 offset-sm-3">
+                                        <button type="submit" class="btn btn-primary">Search</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Results Table -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3 class="card-title">Search Results</h3>
+                </div>
+                <div class="card-body">
+                    {% if ipc_results %}
+                        <div class="alert alert-info">
+                            Found {{ ipc_results.paginator.count }} result{{ ipc_results.paginator.count|pluralize }}.
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>IPC Section Name</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if ipc_results %}
+                                        {% for section in ipc_results %}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ section.0 }}</td>  <!-- This assumes ipc_section is in the first position -->
+                                                <td>{{ section.1 }}</td>  <!-- This assumes ipc_description is in the second position -->
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="3">No IPC Sections found</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                                
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            No results found for your search.
+                        </div>
+                    {% endif %}
+
+                    <!-- Pagination Controls -->
+                    <div class="pagination justify-content-center mt-4">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">First</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <a class="page-link">{{ page_obj.number }}</a>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

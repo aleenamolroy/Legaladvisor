@@ -1,0 +1,237 @@
+{% extends 'client/client_navbar.html' %}
+{% load static %}
+
+{% block content %}
+<br><br><br>
+<div class="container mt-5 d-flex justify-content-center">
+    <div class="card shadow-lg rounded border-0" style="max-width: 900px;">
+        <h2 class="text-center mt-4">{{ advocate.u_name }}'s Profile</h2>
+        <div class="row g-0">
+            <div class="col-md-4 text-center p-4 bg-gradient rounded-left">
+                <!-- Advocate Image -->
+                <img src="{{ advocate.u_img }}" class="profile-img rounded-circle img-fluid shadow" alt="{{ advocate.u_name }}" style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #fff;">
+                <h5 class="card-title mt-3">{{ advocate.u_name }}</h5>
+                <p class="badge bg-primary">{{ advocate.category_name }}</p>
+            </div>
+            <div class="col-md-8">
+                <div class="card-body p-4">
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <p><i class="fas fa-venus-mars me-2"></i><strong>Gender:</strong> {{ advocate.gender }}</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p><i class="fas fa-birthday-cake me-2"></i><strong>Age:</strong> {{ advocate.age }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <p><i class="fas fa-envelope me-2"></i><strong>Email:</strong> <a href="mailto:{{ advocate.email }}" class="text-decoration-none text-primary">{{ advocate.email }}</a></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p><i class="fas fa-phone me-2"></i><strong>Phone:</strong> <a href="tel:{{ advocate.phone }}" class="text-decoration-none text-success">{{ advocate.phone }}</a></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row mb-3">
+                        <div class="col-sm-12">
+                            <p><i class="fas fa-map-marker-alt me-2"></i><strong>Address:</strong> {{ advocate.address }}, {{ advocate.village }}, {{ advocate.taluk }}, {{ advocate.district }}, {{ advocate.state }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <p><i class="fas fa-star me-2"></i><strong>Rating:</strong> <span class="badge bg-primary">{{ advocate.average_rating }}</span> ({{ advocate.review_count }} reviews)</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p><i class="fas fa-id-card me-2"></i><strong>ID Proof:</strong> <a href="{{ advocate.id_proof_url }}" target="_blank" class="text-decoration-none text-info">View ID Proof</a></p>
+                        </div>
+                    </div>
+                    <br>
+                    <!-- Buttons -->
+                    <div class="text-center mt-4">
+                        <a href="{% url 'register_case' advocate.u_id %}" class="btn btn-primary me-2"><i class="fas fa-gavel me-2"></i>Register Case</a>
+                        <a href="{% url 'chat' client_id=client_id advocate_id=advocate.u_id %}" class="btn btn-outline-secondary me-2">
+                            <i class="fas fa-comments me-2"></i>Chat
+                        </a>
+                        <a href="{% url 'book_appointment' advocate_id=advocate.u_id %}" class="btn btn-info me-2">
+                            <i class="fas fa-calendar-alt me-2"></i>Book Appointment
+                        </a>
+                        <a href="{% url 'view_appointments' advocate.u_id %}" class="btn btn-outline-info me-2">
+                            <i class="fas fa-calendar-check me-2"></i>View Appointments
+                        </a>
+                        
+                        <a href="{% url 'feedback' advocate.u_id %}" class="btn btn-warning me-2">
+                            <i class="fas fa-comment-dots me-2"></i>Give Feedback
+                        </a>
+                                                <a href="{% url 'payment' advocate.u_id %}" class="btn btn-success me-2">
+                            <i class="fas fa-money-bill-wave me-2"></i>Make Payment
+                        </a>
+                        <a href="{% url 'advocate_list' %}" class="btn btn-outline-primary"><i class="fas fa-arrow-left me-2"></i>Back to List</a>
+                    </div>
+                    
+                    <!-- Case History Section -->
+                    {% if case_history %}
+                    <button id="toggleCaseHistory" class="btn btn-outline-primary mb-4 toggle-btn">Show Case History</button>                   
+                    <div id="caseHistory" class="d-none">
+                        <hr>
+                        <h4 class="mt-4">Case History</h4>
+                        <div class="table-responsive">
+                            <table id="caseHistoryTable" class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Case Number</th>
+                                        <th>Case Name</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Days Taken</th>
+                                        <th>Court Name</th>
+                                        <th>Category</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for case in case_history %}
+                                    <tr>
+                                        <td>{{ case.case_number }}</td>
+                                        <td>{{ case.case_name }}</td>
+                                        <td>
+                                            {% if case.case_status == "Closed" %}
+                                                <span class="badge bg-success">Closed</span>
+                                            {% elif case.case_status == "In Progress" %}
+                                                <span class="badge bg-warning">In Progress</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ case.case_status }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ case.case_date }}</td>
+                                        <td>{{ case.days_taken }}</td>
+                                        <td>{{ case.court_name }}</td>
+                                        <td>{{ case.case_category }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="pagination" class="d-flex justify-content-center mt-3"></div>
+                    </div>
+                    {% else %}
+                    <hr>
+                    <p class="text-muted text-center mt-4">No case history available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<!-- Custom CSS -->
+<style>
+    .bg-gradient {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: #fff;
+    }
+    .profile-img {
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    hr {
+        border: none;
+        height: 1px;
+        background: #ddd;
+        margin: 20px 0;
+    }
+    .card-body p {
+        font-size: 1.1rem;
+        color: #333;
+    }
+    .text-primary:hover, .text-success:hover, .text-info:hover {
+        text-decoration: underline;
+    }
+    .d-none {
+        display: none;
+    }
+    .toggle-btn {
+        transition: all 0.3s ease;
+        border-width: 2px;
+        font-weight: 500;
+        padding: 10px 20px;
+        border-radius: 30px;
+        background-color: #007bff;
+        color: #fff;
+        border-color: #007bff;
+    }
+    .toggle-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+    .toggle-btn:active {
+        transform: translateY(0);
+        box-shadow: none;
+    }
+    #pagination button {
+        transition: all 0.3s ease;
+    }
+    #pagination button.active {
+        background-color: #007bff;
+        color: #fff;
+    }
+    .table-responsive {
+        overflow-x: auto;
+    }
+</style>
+
+<!-- Add Pagination Script -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var rowsPerPage = 10; // Number of rows per page
+    var table = document.getElementById("caseHistoryTable");
+    var tbody = table.querySelector("tbody");
+    var rows = Array.from(tbody.querySelectorAll("tr")); // Convert rows to array
+    var numPages = Math.ceil(rows.length / rowsPerPage); // Calculate number of pages
+    var paginationControls = document.getElementById("pagination");
+
+    // Function to display a specific page
+    function displayPage(pageNumber) {
+        tbody.innerHTML = ""; // Clear existing rows
+        var start = (pageNumber - 1) * rowsPerPage; // Calculate start index
+        var end = start + rowsPerPage; // Calculate end index
+        var rowsToDisplay = rows.slice(start, end); // Slice rows for current page
+        rowsToDisplay.forEach(row => tbody.appendChild(row)); // Append rows to tbody
+    }
+
+    // Function to create pagination controls
+    function createPaginationControls() {
+        paginationControls.innerHTML = ""; // Clear existing controls
+        for (var i = 1; i <= numPages; i++) {
+            var btn = document.createElement("button");
+            btn.textContent = i;
+            btn.className = "btn btn-outline-secondary me-2";
+            btn.addEventListener("click", function() {
+                displayPage(this.textContent);
+                var activeBtn = paginationControls.querySelector("button.active");
+                if (activeBtn) activeBtn.classList.remove("active"); // Remove active class
+                this.classList.add("active"); // Add active class to current button
+            });
+            paginationControls.appendChild(btn); // Append button to pagination controls
+        }
+    }
+
+    // Initialize pagination
+    createPaginationControls();
+    displayPage(1); // Display first page
+
+    // Toggle Case History Visibility
+    var toggleButton = document.getElementById("toggleCaseHistory");
+    var caseHistoryDiv = document.getElementById("caseHistory");
+    toggleButton.addEventListener("click", function() {
+        caseHistoryDiv.classList.toggle("d-none");
+        toggleButton.textContent = caseHistoryDiv.classList.contains("d-none") ? "Show Case History" : "Hide Case History";
+    });
+});
+</script>
+
+{% endblock %}

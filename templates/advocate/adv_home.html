@@ -172,17 +172,30 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                         <li><a href="contact.html" data-hover="CONTACT">Contact</a></li>-->
                         
                         <li class="dropdown">
-                            <a href="javascript:void(0)" class="dropbtn" data-hover="PROFILE">Settings</a>
-                            <div class="dropdown-content">
-                                <a href="{% url 'advocate_profile_update' %}">Update Profile</a>
-                                <a href="{% url 'change_password_adv' %}">Change Password</a>
-                                <a href="{% url 'advocate_profile' %}">View Profile</a>
-                            </div>
-                        </li>
-                        <li><a href="{% url 'add_case' %}"  data-hover="LOGIN">Previous History</a></li>
-                        <li><a href="{% url 'client_requests' %}"  data-hover="LOGIN">Client Request</a></li>
+    <a href="javascript:void(0)" class="dropbtn" data-hover="PROFILE">Settings</a>
+    <div class="dropdown-content">
+        <a href="{% url 'advocate_profile_update' %}">Update Profile</a>
+        <a href="{% url 'change_password_adv' %}">Change Password</a>
+        <a href="{% url 'advocate_profile' %}">View Profile</a>
+    </div>
+</li>
 
-                        
+                        <li><a href="{% url 'add_case' %}"  data-hover="LOGIN">Previous History</a></li>
+                        <!--<li><a href="{% url 'document_classification' %}" data-hover="LOGIN">Document Classification</a></li>-->
+
+                        <li class="dropdown">
+                            <a href="javascript:void(0)" class="dropbtn" data-hover="PROFILE">Clients</a>
+                            <div class="dropdown-content">
+                                <a href="{% url 'client_request' %}"  data-hover="LOGIN">Client Request</a>                                
+                                <a href="{% url 'client_list' %}">My clients</a>
+                                <a href="{% url 'view_feedback' %}">View Feedback</a> <!-- New Link -->
+
+
+                            </div>
+                            
+                        </li>
+                        <li> <a href="{% url 'advocate_payment_history' %}"  data-hover="LOGIN">Payment History</a>
+                        </li>
                            <li> <a href="{% url 'logout' %}"  data-hover="LOGIN">Logout</a>
                             </li>
                             </ul>
@@ -201,6 +214,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                        <div class="banner-info">
                            <h3>Welcome to Legal Advisor</h3>
                            <p>Start your destiny here...</p>
+                           <h2>Greetings, Advocate! Ready to take on your next case?</h2>
                        </div>
                    </li>
                    

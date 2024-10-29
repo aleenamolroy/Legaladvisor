@@ -1,0 +1,73 @@
+{% extends 'client/client_navbar.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Register New Case</h2>
+    
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Case Information -->
+        <div class="form-group mt-3">
+            <label for="case_name">Case Name</label>
+            <input type="text" id="case_name" name="case_name" class="form-control" required>
+        </div>
+        <div class="form-group mt-3">
+
+
+            <label for="case_description">Case Description</label>
+            <textarea id="case_description" name="case_description" class="form-control" rows="5" required></textarea>
+        </div>
+        <div class="form-group mt-3">
+            <label for="legal_issue">Legal Issue/Section</label>
+            <input type="text" id="legal_issue" name="legal_issue" class="form-control">
+            <small class="form-text text-muted">
+                Not sure about the IPC section? Refer to the <a href="https://www.indiacode.nic.in/handle/123456789/2194?view_type=browse&sam_handle=123456789/1362" target="_blank">IPC Sections</a> for more details.
+            </small>
+        </div>
+        <div class="form-group mt-3">
+            <label for="incident_date">Date of Incident</label>
+            <input type="date" id="incident_date" name="incident_date" class="form-control">
+        </div>
+        
+        <!-- Supporting Documents -->
+        <div class="form-group mt-3">
+            <label for="supporting_documents">Supporting Documents</label>
+            <input type="file" id="supporting_documents" name="supporting_documents" class="form-control-file" multiple>
+        </div>
+        
+        <!-- Requested Services -->
+        <div class="form-group mt-3">
+            <label for="service_type">Type of Legal Service Requested</label>
+            <select id="service_type" name="service_type" class="form-control">
+                <option value="legal_advice">Legal Advice</option>
+                <option value="representation">Representation in Court</option>
+                <option value="document_drafting">Document Drafting</option>
+                <option value="settlement">Settlement Negotiation</option>
+            </select>
+        </div>
+        <div class="form-group mt-3">
+            <label for="expected_outcome">Expected Outcome</label>
+            <textarea id="expected_outcome" name="expected_outcome" class="form-control" rows="3"></textarea>
+        </div>
+        
+        <!-- Urgency -->
+        <div class="form-group mt-3">
+            <label for="priority_level">Priority Level</label>
+            <select id="priority_level" name="priority_level" class="form-control">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+        </div>
+        <div class="form-group mt-3">
+            <label for="deadline">Deadline (if any)</label>
+            <input type="date" id="deadline" name="deadline" class="form-control">
+        </div>
+        
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+    </form>
+</div>
+{% endblock %}

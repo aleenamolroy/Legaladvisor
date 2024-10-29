@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Page</title>
+</head>
+<body>
+    <h1>Payment for Advocate</h1>
+    <p>Order ID: {{ order_id }}</p>
+    <p>Amount: ₹{{ amount }}</p>
+
+    <form action="{% url 'payment_success' %}" method="POST">
+        <script
+            src="https://checkout.razorpay.com/v1/checkout.js"
+            data-key="{{ razorpay_key_id }}"
+            data-amount="{{ amount|floatformat:2 }}"
+            data-currency="{{ currency }}"
+            data-order_id="{{ order_id }}"
+            data-buttontext="Pay with Razorpay"
+            data-name="Legal Advisor"
+            data-description="Consultation Fee Payment"
+            data-image=""
+            data-prefill.name=""
+            data-prefill.email=""
+            data-theme.color="#F37254">
+        </script>
+        {% csrf_token %}
+        <input type="hidden" name="order_id" value="{{ order_id }}">
+    </form>
+</body>
+</html>

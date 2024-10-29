@@ -1,0 +1,52 @@
+{% extends 'client/client_navbar.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Payment History</h2>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Advocate Name</th>
+                    <th>Total Amount</th>
+                    <th>Payment Status</th>
+                    <th>Payment Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payment_history %}
+                <tr>
+                    <td>{{ payment.advocate_name }}</td>
+                    <td>{{ payment.total_amount }}</td>
+                    <td>
+                        {% if payment.payment_status == 'Paid' %}
+                            <span class="badge badge-success">{{ payment.payment_status }}</span>
+                        {% else %}
+                            <span class="badge badge-danger">{{ payment.payment_status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ payment.payment_date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add custom CSS -->
+<style>
+    .thead-dark {
+        background-color: #343a40;
+        color: #fff;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+    .badge-success {
+        background-color: #28a745;
+    }
+    .badge-danger {
+        background-color: #dc3545;
+    }
+</style>
+{% endblock %}

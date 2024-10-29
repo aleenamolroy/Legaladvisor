@@ -1,0 +1,8 @@
+{% extends 'client/client_navbar.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Payment Successful!</h2>
+    <p>Your payment has been processed successfully.</p>
+    <a href="{% url 'client_home' %}" class="btn btn-primary">Go to Home</a>
+</div>
+{% endblock %}

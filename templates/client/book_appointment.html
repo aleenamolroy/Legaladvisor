@@ -1,0 +1,28 @@
+{% extends 'client/client_navbar.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Book Appointment with Advocate</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <label for="appointment_date">Date:</label>
+    <input type="date" id="appointment_date" name="appointment_date" required>
+
+    <label for="appointment_time">Time:</label>
+    <input type="time" id="appointment_time" name="appointment_time" required>
+
+    <button type="submit">Book Appointment</button>
+</form>
+
+<a href="{% url 'advocate_profile_view' advocate_id %}">Back to Profile</a>
+
+{% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% endblock %}

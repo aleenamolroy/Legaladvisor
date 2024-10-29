@@ -1,103 +1,99 @@
 {% extends 'advocate/advocate_navbar.html' %}
-{% load static %}
 
 {% block content %}
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-<style>
-    .request-table {
-        margin-top: 20px;
-    }
-    .request-table img {
-        border-radius: 50%;
-    }
-    .status-button {
-        width: 100%;
-        text-align: center;
-    }
-    .status-button.pending {
-        background-color: #ffc107;
-        color: #fff;
-    }
-    .status-button.accepted {
-        background-color: #14188a;
-        color: #fff;
-    }
-    .status-button.rejected {
-        background-color: #dc3545;
-        color: #fff;
-    }
-</style>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Pending Cases</h2>
+    <div class="mb-3 text-end">
+        <a href="{% url 'client_previous_req' %}" class="btn btn-secondary">View All Case Requests</a>
+    </div>
+    <!-- Table for pending cases -->
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Case Name</th>
+                    <th>Description</th>
+                    <th>Date</th>
+                    <th>Client Name</th>
+                    <th>Email</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for case in pending_cases %}
+                <tr>
+                    <td>{{ case.case_name }}</td>
+                    <td>{{ case.case_description }}</td>
+                    <td>{{ case.case_date }}</td>
+                    <td>{{ case.client_name }}</td>
+                    <td>{{ case.client_email }}</td>
+                    <td class="text-center">
+                        <!-- Button container for better alignment -->
+                        <div class="btn-group" role="group">
+                            <!-- View button to show additional client details -->
+                            <a href="{% url 'view_client_basic_details' case.client_id %}" class="btn btn-info btn-sm me-2">View</a>
+                            <a href="{% url 'view_case_details' case.case_id %}" class="btn btn-primary btn-sm me-2">Details</a>
 
-<div class="container mt-4">
-    <h1 class="mb-4">Client Requests</h1>
-    <table class="table table-striped table-bordered request-table">
-        <thead class="thead-dark">
-            <tr>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>District</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for request in requests %}
-            <tr>
-                <td><img src="{{ request.image }}" alt="Client Image" class="img-fluid" width="50"></td>
-                <td>{{ request.name }}</td>
-                <td>{{ request.phone }}</td>
-                <td>{{ request.email }}</td>
-                <td>{{ request.district }}</td>
-                <td>
-                    {% if request.status == 0 %}
-                        <button class="btn status-button pending" disabled>Pending</button>
-                    {% elif request.status == 1 %}
-                        <button class="btn status-button accepted" disabled>Accepted</button>
-                    {% elif request.status == 2 %}
-                        <button class="btn status-button rejected" disabled>Rejected</button>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if request.status == 0 %}
-                        <button type="button" class="btn btn-success" onclick="updateRequestStatus({{ request.id }}, 1)">Accept</button>
-                        <button type="button" class="btn btn-danger" onclick="updateRequestStatus({{ request.id }}, 2)">Reject</button>
-                    {% else %}
-                        <button type="button" class="btn btn-secondary" disabled>{{ request.status|yesno:"Accepted,Rejected" }}</button>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                            <!-- Accept and Reject buttons -->
+                            <a href="{% url 'handle_case' case.case_id 'accept' %}" class="btn btn-success btn-sm me-2">Accept</a>
+                            <a href="{% url 'handle_case' case.case_id 'reject' %}" class="btn btn-danger btn-sm">Reject</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script>
-    function updateRequestStatus(requestId, status) {
-        console.log('Sending request:', requestId, status);
-        $.ajax({
-            url: '{% url "update_request_status" %}',
-            method: 'POST',
-            data: {
-                'request_id': requestId,
-                'status': status,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
-            },
-            success: function(response) {
-                console.log('Success response:', response);
-                alert('Request updated successfully!');
-                location.reload();  // Reload the page to reflect changes
-            },
-            error: function(xhr, status, error) {
-                console.error('AJAX Error:', status, error);
-                alert('Failed to update request.');
-            }
-        });
+<!-- Add custom CSS -->
+<style>
+    .thead-dark {
+        background-color: #343a40;
+        color: #fff;
     }
-</script>
+    .table-hover tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+    .table th, .table td {
+        vertical-align: middle;
+    }
+    .btn-group .btn {
+        margin-right: 0.5rem;
+    }
+    .btn-group .btn:last-child {
+        margin-right: 0;
+    }
+    
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: white;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: 500;
+        border-radius: 5px;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+        color: white;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .text-end {
+        text-align: right;
+    }
+
+    @media (max-width: 576px) {
+        .text-end {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+    }
 
 
+</style>
 {% endblock %}

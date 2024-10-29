@@ -1,0 +1,148 @@
+{% extends 'admin/admin_navbar_sidebar.html' %}
+{% load static %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">IPC Section Management</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Add IPC Section</h3>
+                </div>
+                <div class="card-body">
+                    <form action="{% url 'ipc_section' %}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-sm-12 col-md-8">
+                                <!-- Single section input -->
+                                <div class="form-group row">
+                                    <label for="ipc_section" class="col-sm-3 col-form-label">IPC Section Name</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" id="ipc_section" name="ipc_section" placeholder="Enter IPC Section">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="ipc_description" class="col-sm-3 col-form-label">Description</label>
+                                    <div class="col-sm-9">
+                                        <textarea name="ipc_description" id="ipc_description" class="form-control" rows="4" placeholder="Enter Description"></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Bulk upload -->
+                                <div class="form-group row">
+                                    <label for="ipc_csv" class="col-sm-3 col-form-label">Upload CSV</label>
+                                    <div class="col-sm-9">
+                                        <input type="file" class="form-control" id="ipc_csv" name="ipc_csv" accept=".csv">
+                                        <small class="text-muted">Upload a CSV file with IPC Section and Description</small>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-sm-9 offset-sm-3">
+                                        <input type="submit" name="ipc" value="Add Now" class="btn btn-primary">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3 class="card-title">IPC Sections List</h3>
+                </div>
+                <div class="card-body">
+                    {% if msgg %}
+                        <div class="alert alert-success">
+                            {{ msgg }}
+                        </div>
+                    {% endif %}
+                    <form id="bulk-delete-form" method="POST" action="{% url 'ipc_bulk_delete' %}">
+                        {% csrf_token %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="select-all"></th>
+                                        <th>No</th>
+                                        <th>IPC Section Name</th>
+                                        <th>Description</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for d in page_obj %}
+                                        <tr>
+                                            <td><input type="checkbox" name="ipc_ids" value="{{ d.0 }}"></td>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ d.1 }}</td>
+                                            <td>{{ d.2 }}</td>
+                                            <td>
+                                                <a href="{% url 'ipc_remove' %}?ipc_id={{ d.0 }}" class="btn btn-danger btn-sm">Remove</a>
+                                            </td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="5">No IPC Sections found</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete selected items? This action is permanent.')">Delete Selected</button>
+                    </form>
+
+                    <!-- Pagination Controls -->
+                    <div class="pagination justify-content-center mt-4">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">First</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <a class="page-link">{{ page_obj.number }}</a>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    document.getElementById('select-all').onclick = function() {
+        var checkboxes = document.querySelectorAll('input[name="ipc_ids"]');
+        for (var checkbox of checkboxes) {
+            checkbox.checked = this.checked;
+        }
+    }
+</script>
+
+{% endblock %}

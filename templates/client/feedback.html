@@ -1,0 +1,84 @@
+{% extends 'client/client_navbar.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Leave Feedback for {{ advocate.u_name }}</h2>
+    <form method="post" action="{% url 'submit_feedback' advocate.u_id %}">
+        {% csrf_token %}
+        
+        <!-- Feedback Text Area -->
+        <div class="mb-3">
+            <label for="feedback_text" class="form-label">Feedback</label>
+            <textarea class="form-control" id="feedback_text" name="feedback_text" rows="4" required></textarea>
+        </div>
+        
+        <!-- Star Rating Scale with Progressive Selection -->
+        <div class="mb-3">
+            <label class="form-label">Rating (1-5)</label>
+            <div class="star-rating" id="star-rating">
+                {% for i in "12345" %}
+                    <span class="star" data-value="{{ i }}">&#9733;</span>
+                {% endfor %}
+                <input type="hidden" name="rating" id="rating" required>
+            </div>
+        </div>
+        
+        <!-- Emoji Dropdown (Unicode-Compatible) -->
+        <div class="mb-3">
+            <label for="emoji" class="form-label">Select Emoji</label>
+            <select class="form-select" id="emoji" name="emoji">
+                <option value="">None</option>
+                <option value="😊">😊 Happy</option>
+                <option value="😞">😞 Sad</option>
+                <option value="😠">😠 Angry</option>
+                <option value="😐">😐 Neutral</option>
+                <option value="👍">👍 Thumbs Up</option>
+                <option value="👎">👎 Thumbs Down</option>
+            </select>
+        </div>
+        
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary">Submit Feedback</button>
+    </form>
+</div>
+
+<!-- Custom CSS for Star Rating -->
+<style>
+    .star-rating {
+        display: inline-flex;
+        font-size: 1.5rem;
+        color: #ccc;
+        cursor: pointer;
+    }
+    .star-rating .star {
+        padding: 0 5px;
+        color: #ccc;
+    }
+    .star-rating .star.selected {
+        color: #ffc107;
+    }
+</style>
+
+<!-- JavaScript for Progressive Star Selection -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const stars = document.querySelectorAll('#star-rating .star');
+        const ratingInput = document.getElementById('rating');
+
+        stars.forEach((star, index) => {
+            star.addEventListener('click', () => {
+                const selectedRating = index + 1;
+                ratingInput.value = selectedRating;  // Update hidden input value
+
+                // Highlight selected stars
+                stars.forEach((s, i) => {
+                    if (i < selectedRating) {
+                        s.classList.add('selected');
+                    } else {
+                        s.classList.remove('selected');
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

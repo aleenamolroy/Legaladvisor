@@ -1,0 +1,66 @@
+{% extends 'admin/admin_navbar_sidebar.html' %}
+{% load static %}
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Payment History</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="card">
+                <!-- Card Header -->
+                <div class="card-header">
+                    <h3 class="card-title">Payment History List</h3>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    {% if payment_history %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Client Name</th>
+                                        <th>Advocate Name</th>
+                                        <th>Total Amount</th>
+                                        <th>Payment Status</th>
+                                        <th>Payment Date</th>
+                                        <th>Admin Commission</th>
+                                        <th>Consultation Fee</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payment in payment_history %}
+                                        <tr>
+                                            <td>{{ payment.client_name }}</td>
+                                            <td>{{ payment.advocate_name }}</td>
+                                            <td>{{ payment.total_amount }}</td>
+                                            <td>{{ payment.payment_status }}</td>
+                                            <td>{{ payment.payment_date }}</td>
+                                            <td>{{ payment.admin_commission }}</td>
+                                            <td>{{ payment.consultation_fee }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            No payment history found.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

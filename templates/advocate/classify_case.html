@@ -1,0 +1,12 @@
+<!-- home/templates/classify_case.html -->
+
+<form method="post" action="{% url 'document_classification' %}">
+    {% csrf_token %}
+    <label for="case_description">Case Description:</label>
+    <textarea id="case_description" name="case_description"></textarea>
+    
+    <label for="legal_issue">Legal Issue:</label>
+    <input id="legal_issue" name="legal_issue" type="text">
+    
+    <button type="submit">Classify Case</button>
+</form>
