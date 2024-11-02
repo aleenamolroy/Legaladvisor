@@ -1,0 +1,45 @@
+{% extends 'advocate/advocate_navbar.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Manage Appointments</h2>
+    {% if appointments %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appointment in appointments %}
+            <tr>
+                <td>{{ appointment.appointment_date }}</td>
+                <td>{{ appointment.appointment_time }}</td>
+                <td>
+                    <!-- Cancel Appointment Button -->
+                    <a href="{% url 'cancel_appointment' appointment_id=appointment.id %}" class="btn btn-danger btn-sm">Cancel</a>
+                    
+                    <!-- Reschedule Appointment Form -->
+                    <button class="btn btn-primary btn-sm" onclick="document.getElementById('rescheduleForm-{{ appointment.id }}').classList.toggle('d-none')">Reschedule</button>
+                    <form action="{% url 'request_reschedule_appointment' appointment_id=appointment.id %}" method="post" class="d-none mt-2" id="rescheduleForm-{{ appointment.id }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="client_id" value="{{ client_id }}">
+                        <input type="hidden" name="advocate_id" value="{{ advocate_id }}">
+                        <input type="date" name="new_date" required>
+                        <input type="time" name="new_time" required>
+                        <input type="hidden" name="client_email" value="{{ appointment.client.email }}">
+                        <button type="submit" class="btn btn-success btn-sm">Send Reschedule Request</button>
+                    </form>
+                    
+                    
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No upcoming appointments found.</p>
+    {% endif %}
+</div>
+{% endblock %}

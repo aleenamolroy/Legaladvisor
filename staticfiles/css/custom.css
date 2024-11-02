@@ -1,0 +1,36 @@
+body {
+    font-family: 'Arial', sans-serif;
+}
+
+.main-sidebar {
+    background-color: #001f3f !important;
+}
+
+.main-header {
+    background-color: #eef1f4 !important;
+}
+
+.nav-link {
+    color: #ffffff;
+}
+
+.nav-link:hover {
+    color: #007bff;
+}
+
+.nav-item .nav-link.active {
+    color: #007bff;
+}
+
+/* Specific styles to hide the icons for the "User Request" field and its sub-items */
+.nav-item.user-request .fas.fa-angle-left {
+    display: none;
+}
+
+.nav-item.user-request .nav-treeview .far.fa-circle {
+    display: none;
+}
+.brand-link {
+    background-color: #eef1f4 !important;
+    color: #000000 !important;
+}

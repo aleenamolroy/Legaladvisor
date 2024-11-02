@@ -42,6 +42,10 @@ urlpatterns = [
         path('advocate/client_previous_req/', views.client_previous_req, name='client_previous_req'),
         path('advocate/payment_history/', views.advocate_payment_history, name='advocate_payment_history'),
         path('advocate/view_feedback//', views.view_feedback, name='view_feedback'),
+path('adv_home/advocate/<int:advocate_id>/client/<int:client_id>/appointments/', views.manage_appointments, name='view_appointments'),
+    path('appointment/cancel/<int:appointment_id>/', views.cancel_appointment, name='cancel_appointment'),
+    path('appointment/reschedule/<int:appointment_id>/', views.reschedule_appointment, name='reschedule_appointment'),
+        path('appointment/request/reschedule/<int:appointment_id>/', views.request_reschedule_appointment, name='request_reschedule_appointment'),
 
         path('client_list/', views.client_list, name='client_list'),
         path('view_client_details/<int:client_id>/', views.view_client_details, name='view_client_details'),

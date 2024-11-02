@@ -1,42 +1,33 @@
-import joblib
 import os
 from django.conf import settings
-import re
-MODEL_PATH = os.path.join(settings.BASE_DIR, 'advocate', 'ml_model.pkl')
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
 
-# Load the trained model
-try:
-    model = joblib.load(MODEL_PATH)
-    print(f"Model loaded successfully from {MODEL_PATH}")
-except FileNotFoundError:
-    model = None
-    print(f"Model file not found at {MODEL_PATH}. Please ensure 'ml_model.pkl' is in the correct directory.")
-except Exception as e:
-    model = None
-    print(f"Error loading model: {e}")
+MODEL_NAME = "nlpaueb/legal-bert-base-uncased"  # Hugging Face model for legal text classification
 
-def clean_text(text):
-    # Remove case numbers, dates, special characters, and digits
-    text = re.sub(r'\d+', '', text)  # Remove digits
-    text = re.sub(r'[^\w\s]', '', text)  # Remove special characters
-    text = text.lower()  # Convert to lowercase
-    return text
-
-def preprocess_text(text):
-    # Basic preprocessing: Lowercase, remove extra spaces, etc.
-    return text.lower().strip()
+# Load the tokenizer and model
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
 
 def classify_document(text):
-    if model:
-        try:
-            # Preprocess the input text
-            preprocessed_text = preprocess_text(text)
-            prediction = model.predict([preprocessed_text])[0]
-            print(f"Predicted category: {prediction}")
-            return prediction
-        except Exception as e:
-            print(f"Error during prediction: {e}")
-            return 'Uncategorized'
-    else:
+    try:
+        # Tokenize the input text
+        inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
+        
+        # Perform prediction
+        with torch.no_grad():
+            outputs = model(**inputs)
+            logits = outputs.logits
+            predicted_class_id = logits.argmax().item()
+        
+        # Map predicted class ID to class name (you need to define this mapping)
+        class_names = ["theft", "murder", "robbery", 
+        "other", "assault", "fraud", "embezzlement", "kidnapping", 
+        "business_disputes", "personal_issues", "confidentiality_breach"] 
+        predicted_class = class_names[predicted_class_id]
+        
+        print(f"Predicted category: {predicted_class}")
+        return predicted_class
+    except Exception as e:
+        print(f"Error during prediction: {e}")
         return 'Uncategorized'
-

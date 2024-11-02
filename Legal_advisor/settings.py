@@ -1,4 +1,3 @@
-
 import os
 from pathlib import Path
 
@@ -55,6 +54,7 @@ ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -86,6 +86,8 @@ TEMPLATES = [
     },
 ]
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
+
 WSGI_APPLICATION = 'Legal_advisor.wsgi.application'
 
 # Razorpay API Keys Y6BonJIr6wHpNMK4eo1NHYoo
@@ -98,14 +100,11 @@ RAZORPAY_KEY_SECRET = 'jo7RcNBDpB5qIYJ3NUBKHeVk'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'legal_advisor',  # Replace with your database name
-        'USER': 'root',  # Replace with your MySQL username
-        'PASSWORD':"",  
-        'HOST': 'localhost',  # The IP address of your MySQL server (usually localhost or 127.0.0.1 for XAMPP)
-        'PORT': '3306',  # The port your MySQL server is running on (3306 is the default port for MySQL)
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-        },
+        'NAME': 'Legaladvisor_worrylawit',  # Your database name
+        'USER': 'Legaladvisor_worrylawit',  # Your MySQL username
+        'PASSWORD': '31186f5ba20d2da530b3322a7783969c453b2617',  # Your MySQL password
+        'HOST': '1dtg8.h.filess.io',  # Your database host
+        'PORT': '3307',  # Your database port
     }
 }
 
@@ -148,10 +147,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS=[
     os.path.join(BASE_DIR,'static')
 ]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -160,4 +160,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Use Whitenoise for static files
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 

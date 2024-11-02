@@ -2172,6 +2172,11 @@ from django.conf import settings
 
 conn = pymysql.connect(host="localhost", user="root", password="", database="legal_advisor")
 
+from django.shortcuts import render, redirect
+from django.conf import settings
+from .classification import classify_document
+from PyPDF2 import PdfReader 
+import os
 @never_cache
 def register_case(request, advocate_id):
     if "client_id" not in request.session:
@@ -2181,72 +2186,36 @@ def register_case(request, advocate_id):
 
     if request.method == "POST":
         case_name = request.POST.get("case_name")
-        case_description = request.POST.get("case_description")
-        legal_issue = request.POST.get("legal_issue")
-        incident_date = request.POST.get("incident_date")
-        service_type = request.POST.get("service_type")
-        expected_outcome = request.POST.get("expected_outcome")
-        priority_level = request.POST.get("priority_level")
-        deadline = request.POST.get("deadline")
-        case_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-        # Handle file uploads
         supporting_documents = request.FILES.getlist("supporting_documents")
-        document_paths = []
-        if supporting_documents:
-            upload_path = os.path.join(settings.MEDIA_ROOT, 'case_documents')
-            if not os.path.exists(upload_path):
-                os.makedirs(upload_path)
+        
+        for doc in supporting_documents:
+            if doc.name.endswith('.pdf'):
+                # Save the PDF file temporarily
+                pdf_path = os.path.join(settings.MEDIA_ROOT, 'case_documents', doc.name)
+                with open(pdf_path, 'wb+') as destination:
+                    for chunk in doc.chunks():
+                        destination.write(chunk)
                 
-            for doc in supporting_documents:
-                doc_name = f"{client_id}_{advocate_id}_{doc.name}"
-                doc_path = os.path.join(upload_path, doc_name)
+                # Extract text from the PDF
+                with open(pdf_path, 'rb') as file:
+                    reader = PdfReader(file)
+                    text = ""
+                    for page in reader.pages:
+                        text += page.extract_text() or ""
                 
-                # Check if the file is an image or Word document and convert to PDF
-                mime_type, _ = mimetypes.guess_type(doc.name)
-                if mime_type.startswith("image/"):
-                    pdf_path = convert_image_to_pdf(doc, doc_name)
-                    document_paths.append(pdf_path)
-                elif mime_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-                    pdf_path = convert_word_to_pdf(doc, doc_name)
-                    document_paths.append(pdf_path)
-                else:
-                    # Save the original file if it's not an image or Word document
-                    with open(doc_path, 'wb+') as destination:
-                        for chunk in doc.chunks():
-                            destination.write(chunk)
-                    document_paths.append(f"case_documents/{doc_name}")
-
-        document_paths_str = ",".join(document_paths) if document_paths else None
-
-        # Insert the new case into the database
-        query = """
-        INSERT INTO tbl_case (client_id, advocate_id, case_name, case_description, legal_issue, incident_date, service_type, expected_outcome, priority_level, deadline, case_date, supporting_documents, status)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """
-
-        with conn.cursor() as cursor:
-            cursor.execute(query, [
-                client_id, advocate_id, case_name, case_description, legal_issue,
-                incident_date, service_type, expected_outcome, priority_level,
-                deadline, case_date, document_paths_str, "Pending"
-            ])
-            case_id = cursor.lastrowid
-
-            classification_results = []
-            if supporting_documents:
-                for document_path in document_paths:
-                    file_path = os.path.join(settings.MEDIA_ROOT, document_path)
-                    classification = classify_document(file_path)
-
-                    classification_results.append(classification)
-
-                    if classification != "Uncategorized":
-                        cursor.execute('UPDATE tbl_case SET classification = %s WHERE case_id = %s', (classification, case_id))
-                    else:
-                         print(f"{document_path} was classified as Uncategorized. Please check the content.")
-
-        conn.commit()
+                # Classify the document
+                classification = classify_document(text)
+                
+                # Insert the new case into the database (add classification)
+                query = """
+                INSERT INTO tbl_case (client_id, advocate_id, case_name, classification, status)
+                VALUES (%s, %s, %s, %s, %s)
+                """
+                with conn.cursor() as cursor:
+                    cursor.execute(query, [client_id, advocate_id, case_name, classification, "Pending"])
+                
+                # Optionally, remove the temporary PDF file
+                os.remove(pdf_path)
 
         return redirect("advocate_profile_view", advocate_id=advocate_id)
 
@@ -3384,7 +3353,7 @@ def book_appointment(request, advocate_id):
         appointment_date = request.POST.get("appointment_date")
         appointment_time = request.POST.get("appointment_time")
 
-        with conn.cursor() as cursor:
+        with connection.cursor() as cursor:
             # Check advocate availability
             check_availability_query = """
                                         SELECT * FROM tbl_appointment
@@ -3402,16 +3371,32 @@ def book_appointment(request, advocate_id):
                                         VALUES (%s, %s, %s, %s)
                                         """
             cursor.execute(insert_appointment_query, (advocate_id, client_id, appointment_date, appointment_time))
-            conn.commit()
+            connection.commit()
+
+            # Fetch advocate's email to notify them about the appointment
+            cursor.execute("SELECT email FROM tbl_user WHERE u_id = %s", [advocate_id])
+            advocate = cursor.fetchone()
+
+            # Fetch client’s name
+            cursor.execute("SELECT u_name FROM tbl_user WHERE u_id = %s", [client_id])
+            client = cursor.fetchone()
+
+            if advocate and client:
+                advocate_email = advocate[0]
+                client_name = client[0]
+                subject = "New Appointment Booked"
+                message = f"A new appointment has been booked:\n\nDate: {appointment_date}\nTime: {appointment_time}\nClient Name: {client_name}"
+                from_email = settings.EMAIL_HOST_USER
+
+                # Send email notification
+                send_mail(subject, message, from_email, [advocate_email])
 
         return HttpResponse("Appointment booked successfully")
 
-    # Render the appointment booking page
     context = {
         "advocate_id": advocate_id
     }
     return render(request, "client/book_appointment.html", context)
-
 
 from django.utils import timezone
 from django.shortcuts import render
@@ -3424,27 +3409,30 @@ def view_appointments(request, advocate_id):
     request.session['advocate_id'] = advocate_id
 
     client_id = request.session.get("client_id")
-    current_time = timezone.now()
+    current_datetime = timezone.now()  # Current date and time
 
     with connection.cursor() as cursor:
         # Fetch upcoming appointments
         upcoming_appointments_query = """
         SELECT id, appointment_date, appointment_time
         FROM tbl_appointment
-        WHERE advocate_id = %s AND client_id = %s AND (appointment_date > %s OR (appointment_date = %s AND appointment_time > %s))
+        WHERE advocate_id = %s AND client_id = %s 
+        AND (appointment_date > %s OR (appointment_date = %s AND appointment_time > %s))
         ORDER BY appointment_date, appointment_time
         """
-        cursor.execute(upcoming_appointments_query, (advocate_id, client_id, current_time.date(), current_time.date(), current_time.time()))
+        cursor.execute(upcoming_appointments_query, 
+                       (advocate_id, client_id, current_datetime.date(), current_datetime.date(), current_datetime.time()))
         upcoming_appointments = cursor.fetchall()
 
-        # Fetch past appointments
+        # Fetch past appointments using combined datetime
         past_appointments_query = """
         SELECT id, appointment_date, appointment_time
         FROM tbl_appointment
-        WHERE advocate_id = %s AND client_id = %s AND (appointment_date < %s OR (appointment_date = %s AND appointment_time < %s))
+        WHERE advocate_id = %s AND client_id = %s 
+        AND TIMESTAMP(appointment_date, appointment_time) <= %s
         ORDER BY appointment_date DESC, appointment_time DESC
         """
-        cursor.execute(past_appointments_query, (advocate_id, client_id, current_time.date(), current_time.date(), current_time.time()))
+        cursor.execute(past_appointments_query, (advocate_id, client_id, current_datetime))
         past_appointments = cursor.fetchall()
 
     # Convert tuples to dictionaries for better access in templates
@@ -3461,19 +3449,40 @@ def view_appointments(request, advocate_id):
         'past_appointments': past_appointments,
     }
     return render(request, 'client/view_appointments.html', context)
-
 from django.shortcuts import redirect
 from django.db import connection
 from django.http import HttpResponse
 def cancel_appointment(request, appointment_id):
     try:
         with connection.cursor() as cursor:
+            # Get appointment details
+            cursor.execute("SELECT advocate_id, client_id, appointment_date, appointment_time FROM tbl_appointment WHERE id = %s", [appointment_id])
+            appointment = cursor.fetchone()
+            if not appointment:
+                return HttpResponse("Appointment not found.")
+
+            advocate_id, client_id, appointment_date, appointment_time = appointment
+
             # Update the appointment status to 'Cancelled'
-            cursor.execute(
-                "UPDATE tbl_appointment SET status = 'Cancelled' WHERE id = %s",
-                [appointment_id]
-            )
-        
+            cursor.execute("UPDATE tbl_appointment SET status = 'Cancelled' WHERE id = %s", [appointment_id])
+            connection.commit()
+
+            # Fetch advocate's email and client name for notification
+            cursor.execute("SELECT email FROM tbl_user WHERE u_id = %s", [advocate_id])
+            advocate = cursor.fetchone()
+            cursor.execute("SELECT u_name FROM tbl_user WHERE u_id = %s", [client_id])
+            client = cursor.fetchone()
+
+            if advocate and client:
+                advocate_email = advocate[0]
+                client_name = client[0]
+                subject = "Appointment Canceled"
+                message = f"An appointment has been canceled:\n\nDate: {appointment_date}\nTime: {appointment_time}\nClient Name: {client_name}"
+                from_email = settings.EMAIL_HOST_USER
+
+                # Send email notification
+                send_mail(subject, message, from_email, [advocate_email])
+
         # Redirect back to the appointments page after cancellation
         advocate_id = request.session.get('advocate_id')  # Retrieve advocate_id from the session
         if advocate_id is None:
@@ -3482,3 +3491,72 @@ def cancel_appointment(request, appointment_id):
         return redirect('view_appointments', advocate_id=advocate_id)
     except Exception as e:
         return HttpResponse(f"Error cancelling appointment: {str(e)}")
+from django.shortcuts import render, redirect
+from django.db import connection
+from django.utils import timezone
+from django.contrib import messages  # Add this line at the top of your file
+
+def manage_appointments(request, advocate_id, client_id):
+    current_datetime = timezone.now()
+
+    # Fetch appointments
+    with connection.cursor() as cursor:
+        # Retrieve upcoming appointments
+        cursor.execute("""
+            SELECT id, appointment_date, appointment_time
+            FROM tbl_appointment
+            WHERE advocate_id = %s AND client_id = %s 
+            AND TIMESTAMP(appointment_date, appointment_time) > %s
+            ORDER BY appointment_date, appointment_time
+        """, (advocate_id, client_id, current_datetime))
+        appointments = cursor.fetchall()
+
+    # Convert tuples to dictionaries for template access
+    appointments = [
+        {'id': row[0], 'appointment_date': row[1], 'appointment_time': row[2]} for row in appointments
+    ]
+
+    context = {
+        'advocate_id': advocate_id,
+        'client_id': client_id,
+        'appointments': appointments,
+    }
+    return render(request, 'advocate/manage_appointment.html', context)
+
+# Function to cancel an appointment
+def cancel_appointment(request, appointment_id):
+    with connection.cursor() as cursor:
+        cursor.execute("DELETE FROM tbl_appointment WHERE id = %s", [appointment_id])
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+# Function to reschedule an appointment
+def reschedule_appointment(request, appointment_id):
+    if request.method == 'POST':
+        new_date = request.POST.get('new_date')
+        new_time = request.POST.get('new_time')
+        
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                UPDATE tbl_appointment 
+                SET appointment_date = %s, appointment_time = %s 
+                WHERE id = %s
+            """, (new_date, new_time, appointment_id))
+        return redirect(request.META.get('HTTP_REFERER', '/'))
+    return render(request, 'advocate/reschedule_appointment.html', {'appointment_id': appointment_id})
+def request_reschedule_appointment(request, appointment_id):
+    if request.method == 'POST':
+        new_date = request.POST['new_date']
+        new_time = request.POST['new_time']
+        client_email = request.POST['client_email']
+        advocate_id = request.POST.get('advocate_id')
+        client_id = request.POST.get('client_id')
+
+        # Send email to the client for rescheduling
+        subject = 'Appointment Rescheduling Request'
+        message = f'Your appointment has been requested to be rescheduled to {new_date} at {new_time}.'
+        send_mail(subject, message, 'from@example.com', [client_email])
+
+        messages.success(request, 'Reschedule request sent successfully!')
+        
+        # Redirect to the appointment management view with both advocate_id and client_id
+        return redirect('view_appointments', advocate_id=advocate_id, client_id=client_id)
