@@ -32,7 +32,13 @@ from django.db import connection
 from django.views.decorators.http import require_POST
 import json
 now = datetime.datetime.now()
-conn = pymysql.connect(host="localhost", user="root", password="", database="legal_advisor")
+conn = pymysql.connect(
+    host="1dtg8.h.filess.io",
+    user="Legaladvisor_worrylawit",
+    password="31186f5ba20d2da530b3322a7783969c453b2617",
+    database="Legaladvisor_worrylawit",
+    port=3307
+)
 c = conn.cursor()
 
 def index(request):
@@ -809,7 +815,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 
 now = datetime.datetime.now()
-conn = pymysql.connect(host="localhost", user="root", password="", database="legal_advisor")
+conn = pymysql.connect(
+    host="1dtg8.h.filess.io",
+    user="Legaladvisor_worrylawit",
+    password="31186f5ba20d2da530b3322a7783969c453b2617",
+    database="Legaladvisor_worrylawit",
+    port=3307
+)
 c = conn.cursor()
 
 def index(request):
@@ -2154,7 +2166,13 @@ from django.conf import settings
 from home.classify_document import classify_document  # Adjust the import based on where classify_document is defined
 
 # Establish MySQL connection
-conn = pymysql.connect(host="localhost", user="root", password="", database="legal_advisor")
+conn = pymysql.connect(
+    host="1dtg8.h.filess.io",
+    user="Legaladvisor_worrylawit",
+    password="31186f5ba20d2da530b3322a7783969c453b2617",
+    database="Legaladvisor_worrylawit",
+    port=3307
+)
 
 import os
 from datetime import datetime
@@ -2170,7 +2188,13 @@ from datetime import datetime
 from django.conf import settings
 # Establish MySQL connection
 
-conn = pymysql.connect(host="localhost", user="root", password="", database="legal_advisor")
+conn = pymysql.connect(
+    host="1dtg8.h.filess.io",
+    user="Legaladvisor_worrylawit",
+    password="31186f5ba20d2da530b3322a7783969c453b2617",
+    database="Legaladvisor_worrylawit",
+    port=3307
+)
 
 from django.shortcuts import render, redirect
 from django.conf import settings
@@ -2827,7 +2851,13 @@ def payment_view(request, advocate_id):
     conn = None
     cursor = None
     try:
-        conn = pymysql.connect(host="localhost", user="root", password="", database="legal_advisor")
+        conn = pymysql.connect(
+    host="1dtg8.h.filess.io",
+    user="Legaladvisor_worrylawit",
+    password="31186f5ba20d2da530b3322a7783969c453b2617",
+    database="Legaladvisor_worrylawit",
+    port=3307
+)
         cursor = conn.cursor()
     
         insert_payment_query = """INSERT INTO tbl_payment (client_id, advocate_id, amount_paid, payment_date, 
@@ -2876,7 +2906,13 @@ def payment_success(request):
             })
 
             # Update payment details in the database
-            conn = pymysql.connect(host="localhost", user="root", password="", database="legal_advisor")
+            conn = pymysql.connect(
+    host="1dtg8.h.filess.io",
+    user="Legaladvisor_worrylawit",
+    password="31186f5ba20d2da530b3322a7783969c453b2617",
+    database="Legaladvisor_worrylawit",
+    port=3307
+)
             cursor = conn.cursor()
 
             update_payment_query = """UPDATE tbl_payment SET payment_status = %s, payment_date = %s,
@@ -2897,7 +2933,13 @@ def payment_success(request):
     return redirect('client/advocate_profile.html')
 
 def admin_payment_history(request):
-    conn = pymysql.connect(host="localhost", user="root", password="", database="legal_advisor")
+    conn = pymysql.connect(
+    host="1dtg8.h.filess.io",
+    user="Legaladvisor_worrylawit",
+    password="31186f5ba20d2da530b3322a7783969c453b2617",
+    database="Legaladvisor_worrylawit",
+    port=3307
+)
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     
     query = """
@@ -2923,7 +2965,13 @@ def admin_payment_history(request):
 
 def advocate_payment_history(request):
     advocate_id = request.session.get('adv_id')
-    conn = pymysql.connect(host="localhost", user="root", password="", database="legal_advisor")
+    conn = pymysql.connect(
+    host="1dtg8.h.filess.io",
+    user="Legaladvisor_worrylawit",
+    password="31186f5ba20d2da530b3322a7783969c453b2617",
+    database="Legaladvisor_worrylawit",
+    port=3307
+)
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     
     query = """
@@ -2944,7 +2992,13 @@ def advocate_payment_history(request):
     return render(request, 'advocate/payment_history.html', {'payment_history': payment_history})
 def client_payment_history(request):
     client_id = request.session.get('client_id')  # Assuming client_id is stored in session after login
-    conn = pymysql.connect(host="localhost", user="root", password="", database="legal_advisor")
+    conn = pymysql.connect(
+    host="1dtg8.h.filess.io",
+    user="Legaladvisor_worrylawit",
+    password="31186f5ba20d2da530b3322a7783969c453b2617",
+    database="Legaladvisor_worrylawit",
+    port=3307
+)
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     
     query = """
@@ -2969,7 +3023,13 @@ def previous_case_requests(request):
     advocate_id = request.session.get('advocate_id')  # Assuming advocate_id is stored in the session
     sort_option = request.GET.get('sort', '')  # Get the sorting option from the query parameters
 
-    conn = pymysql.connect(host="localhost", user="root", password="", database="legal_advisor")
+    conn = pymysql.connect(
+    host="1dtg8.h.filess.io",
+    user="Legaladvisor_worrylawit",
+    password="31186f5ba20d2da530b3322a7783969c453b2617",
+    database="Legaladvisor_worrylawit",
+    port=3307
+)
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     
     # Base query
@@ -3199,7 +3259,13 @@ def feedback(request, advocate_id):
         return redirect("login")
     
     # Establish MySQL connection
-    conn = pymysql.connect(host="localhost", user="root", password="", database="legal_advisor")
+    conn = pymysql.connect(
+    host="1dtg8.h.filess.io",
+    user="Legaladvisor_worrylawit",
+    password="31186f5ba20d2da530b3322a7783969c453b2617",
+    database="Legaladvisor_worrylawit",
+    port=3307
+)
     try:
         with conn.cursor(pymysql.cursors.DictCursor) as cursor:
             # Fetch advocate's name for display
@@ -3341,7 +3407,13 @@ import pymysql
 from datetime import datetime
 
 # Establish the database connection
-conn = pymysql.connect(host="localhost", user="root", password="", database="legal_advisor")
+conn = pymysql.connect(
+    host="1dtg8.h.filess.io",
+    user="Legaladvisor_worrylawit",
+    password="31186f5ba20d2da530b3322a7783969c453b2617",
+    database="Legaladvisor_worrylawit",
+    port=3307
+)
 
 def book_appointment(request, advocate_id):
     if "client_id" not in request.session:
